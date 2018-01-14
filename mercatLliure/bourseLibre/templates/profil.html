@@ -1,0 +1,24 @@
+{% extends 'base.html' %} 
+{% block title %}Profil de {{ user.username }} {% endblock %}
+{% block subtitle %}
+Profil de {{ user.username }}
+{% endblock %}
+{% block content %}
+<ul>
+  {% if user.get_full_name %}
+  <li>Utilisateur: {{ user.get_full_name }}</li>
+  {% endif %}
+
+  <li>Description: {{ user.profil.description }}</li>
+  {% if user.profil.avatar %}
+  <li>avatar: {{ user.profil.avatar }}</li>
+  {%endif%}
+  {% if user.profil.site_web %}
+  <li>site_web: {{ user.profil.site_web }}</li>
+  {%endif%}
+  <li>inscrit_newsletter: {{ user.profil.inscrit_newsletter }}</li>
+  <li>date adhésion: {{ user.profil.date_registration }}</li>
+</ul>
+{% endblock %}
+
+    

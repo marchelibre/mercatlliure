@@ -1,0 +1,11 @@
+{% extends 'blog/baseBlog.html' %} 
+{% block content %}
+<h1>Bienvenue sur le blog !!</h1>
+{% for p in posts %}
+<a href="{% url 'lireArticle' slug=article.slug %}">
+<p>{{p.title}}, 
+Auteur: {{p.author.name}} le {{p.date}} {{p.body|truncate_words(8)}} </p>
+<p>Lire la suite...</a></p>
+{% endfor %}
+
+{% endblock %}

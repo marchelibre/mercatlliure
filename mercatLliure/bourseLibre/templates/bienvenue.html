@@ -1,0 +1,49 @@
+{% extends 'base.html' %} 
+{% block title %}Acceuil{% endblock %}
+
+			<div class="jumbotron well">
+{% block subtitle %}
+<h1 class = "textcenter">Benvingut al Mercat Lliure</h1>
+
+<h3 class = "textcenter"> Mercat 100% gratuït i lliure !</h3>
+<h3 class = "textcenter"> De producteurs à producteurs de richesse !</h3>
+
+{% endblock %}
+{% block content %}
+<div class="row">
+		<div class="col-md-4">
+			<h2>
+				Pourquoi ?
+			</h2>
+			<p>
+				Ce site vous offre la possibilité d'échanger avec vos voisins, des biens, des services, de la compagnie !
+			</p>
+			<p>
+				<a class="btn" href="#">en savoir plus...</a>
+			</p>
+		</div>
+		<div class="col-md-4">
+			<h2>
+				Comment ?
+			</h2>
+			<p>
+				Inscrivez vous etparticipez au réseau de coopération locale...
+			</p>
+			<p>
+				<a class="btn" href="#">en savoir plus...</a>
+			</p>
+		</div>
+		<div class="col-md-4">
+			<h2>
+				Mais encore ?
+			</h2>
+			<p>
+				L'entraide en ces temps troubles devient primordiale, à nous de nous organiser...
+			</p>
+			<p>
+				<a class="btn" href="#">en savoir plus...</a>
+			</p>
+		</div>
+	</div>
+
+{% endblock %}

@@ -1,0 +1,121 @@
+body {
+    /*#background-color: #9999ff ;
+    #9999ff url("../images/background.png");%url("../images/background.png");*/
+    background: #E9E9E9;
+    margin: auto;
+    width: 90%;
+    padding: 10px;
+}
+.textcenter{
+    text-align: center;
+}
+.textright{
+    text-align: right;
+}
+.textmiddle{
+    vertical-align:middle;
+}
+ul.errorlist {
+    padding-left: 0;
+}
+
+ul.errorlist > li {
+    list-style: none;
+}
+.row{
+    margin-right: 15px;
+    margin-left: 15px;
+    padding: 5px 5px 5px 5px;
+}
+/*.breadcrumb span, .breadcrumb div {display:inline-block!important; float:left!important}*/
+.navbar {
+    border-radius: 0.4em;
+    border: 3px solid #053200;
+    %margin-bottom: 2em
+}
+
+.navbar-brand {
+    font-family: 'Satisfy', cursive;
+}
+
+.contenu{
+    margin-top: 5em;
+    margin-bottom: 2em;
+    border-radius: 0.4em;
+    border: 3px solid #053200;
+    padding: 10px 10px 10px 10px;
+}
+/*
+.glyph  icon-star {
+    color: #CCCCCC;
+    font-size: 16px;
+}
+
+.glyphicon-star.active {
+    color: #FDB230;
+}*/
+.paddingbase{
+    padding: 10px 10px 10px 10px;
+}
+
+.soustitre{
+    padding: 7em 2em 7em 2em;
+    border-radius: 0.4em;
+    /*rder: 1px solid #053200;*/
+    padding: 10px 10px 10px 10px;
+}
+.bodycontenu{
+    padding: 7em 2em 7em 2em;
+    padding-bottom: 2em;
+    border-radius: 0.5em;
+    /*border: 1px solid #053200;*/
+    padding: 10px 10px 10px 10px;
+}
+
+
+.infos{
+    font-size:small;
+}
+
+.col_cat{
+    border-radius: 1em;
+    padding: 10px 15px 10px 15px;
+}
+.col_cat a:link, a:visited {
+    color: black;
+}
+.extratest:hover{
+opacity: 0.7;
+}
+/*
+.col_aliment{
+   /* border-left: 6px solid #CEECF5;*/
+    color: black;/*#6666ff*/
+}
+.col_vegetaux{
+    color: black;/*
+    text-color: #A9F5A9*/
+}
+.col_services{
+    color: black;/*
+    text-color: #D8D8D8*/
+}
+.col_objets{
+    color: black;
+    /*
+    text-color: #0055FE*/
+}*/
+
+.row .col-xs-2, .row .col-xs-10{display:inline-block; float: none}
+
+.tablecustom{
+    background-color:grey;
+}
+.offre{
+    padding-bottom:10px;
+    border-radius: 0.8em;
+}
+.offre:hover{
+opacity:0.85;
+    border-radius: 1em;
+}

@@ -1,0 +1,44 @@
+{% extends 'blog/baseBlog.html' %}
+{% block subtitle %}
+{{ article.titre }}
+{% endblock %}
+{% block content %}
+<p class="infos">Catégorie: {{ article.categorie }}, rédigé par <a href="{% url 'profil' article.auteur.user.id %}"> {{ article.auteur }}</a>, le {{ article.date|date:"DATE_FORMAT" }}</p>
+
+<div class="contenu">{{ article.contenu }}</div>
+<div class="textright" >
+    <a href="{% url 'blog:accueil'  %}"><button "class="btn btn-default" >Retour au sommaire</button></a>
+</div>
+
+{% if commentaires %}
+<hr>
+<div>
+<h3>Commentaires</h3>
+<ol>
+{% for comment in commentaires %}
+        <li><p>Posté par: {{ comment.nom }} {% if comment.email%} {{ comment.email }}){%endif%}, le {{ comment.date_creation }} </p>
+        <p>{{ comment.commentaire }}</p></li>
+{% endfor %}
+</ol>
+</div>
+{% endif %}
+
+
+{% if form %}
+<hr>
+<div>
+<h4 class="form-group">Laisser un commentaire :</h4>
+<form class="form-horizontal" role="form" action="" method="post" enctype="multipart/form-data">
+    {% csrf_token %} 
+    <input type="hidden" name="Commentaire"
+        value="{{ commentaire }}"> {% include 'form_template.html'%}
+    <div class="form-group textright">
+        <div class="col-sm-offset-2 col-sm-10">
+            <button type="submit" class="btn btn-success">Poster</button>
+        </div>
+    </div>
+</form>
+</div>
+{% endif %}
+
+{% endblock %}

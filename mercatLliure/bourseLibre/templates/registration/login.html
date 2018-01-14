@@ -1,0 +1,45 @@
+{% extends 'base.html' %} 
+
+{% block subtitle %}
+Log in
+{% endblock subtitle %}
+
+{% block content %}
+    <div class="row justify-content-center">
+        <div class="col ">
+
+                    {% if error_message %}
+                        <p><strong>{{ error_message }}</strong></p>
+                    {% endif %}
+                    <form class="form-horizontal" role="form" action="{% url 'login_user' %}" method="post" enctype="multipart/form-data">
+                        {% csrf_token %}
+                        <div class="form-group">
+                            <label class="control-label col-sm-2" for="id_username">
+                                Username:
+                            </label>
+                            <div class="col-sm-10">
+                                <input id="id_username" maxlength="40" name="username" type="text">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="control-label col-sm-2" for="id_password">
+                                Password:
+                            </label>
+                            <div class="col-sm-10">
+                                <input id="id_password" maxlength="40" name="password" type="password">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <div class="col-sm-offset-2 col-sm-10">
+                                <button type="submit" class="btn btn-success">Go</button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+                <div class="panel-footer">
+                    Nouveau sur le site ? <a href="{% url 'register' %}">Clique ici</a> pour t'enregistrer.
+                </div>
+
+
+{% endblock %}
