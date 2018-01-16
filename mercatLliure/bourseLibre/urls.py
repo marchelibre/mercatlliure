@@ -28,7 +28,7 @@ from django.contrib import admin
 
 urlpatterns = [
     url(r'^$', views.bienvenue, name='bienvenue'),
-    url(r'^admin/', include(admin.site.urls), name='admin'),
+    url(r'^admin/', admin.site.urls, name='admin'),
     url(r'^merci', views.merci, name='merci'),
     url(r'^blog/', include('blog.urls', namespace='bourseLibre.blog')),
     url(r'^accounts/profile/(?P<user_id>[0-9]+)$', views.profil, name='profil',),

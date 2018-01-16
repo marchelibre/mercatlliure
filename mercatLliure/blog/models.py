@@ -19,7 +19,7 @@ class Article(models.Model):
         choices=(('Histoire', 'Histoire'), ('Bon plan', 'Bon plan'), ('Descriptif', 'Descriptif'), ('autre','autre'),),
         default='Histoire', verbose_name="categorie")
     titre = models.CharField(max_length=100)
-    auteur = models.ForeignKey(Profil)
+    auteur = models.ForeignKey(Profil, on_delete=models.CASCADE)
     slug = models.SlugField(max_length=100)
     contenu = models.TextField(null=True)
     date = models.DateTimeField(auto_now_add=True, auto_now=False, verbose_name="Date de parution")
@@ -42,7 +42,7 @@ class Commentaire(models.Model):
     email = models.EmailField(max_length=75)
     siteweb = models.URLField(max_length=200, null=True, blank=True)
     commentaire = models.TextField()
-    article = models.ForeignKey(Article)
+    article = models.ForeignKey(Article, on_delete=models.CASCADE)
     date_creation = models.DateTimeField(auto_now_add=True)
 
     def __unicode__(self):

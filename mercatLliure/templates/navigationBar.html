@@ -1,41 +1,66 @@
 
 {% block navBar %}
-    <nav class="navbar collapse navbar-collapse navbar-expand-md navbar-dark fixed-top bg-dark" data-offset-top="3em">
-        <a class="navbar-brand" href="{% url 'bienvenue' %}"> MercatLliure </a>
-        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarsActuel"
-              aria-expanded="true" aria-label="Toggle navigation">
+{%comment%}
+<nav class="navbar navbar-toggleable-md navbar-light bg-faded">
+  <button class="navbar-toggler navbar-toggler-right" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+    <span class="navbar-toggler-icon"></span>
+  </button>
+  <a class="navbar-brand" href="#">Navbar</a>
+
+  <div class="collapse navbar-collapse" id="navbarSupportedContent">
+    <ul class="navbar-nav mr-auto">
+      <li class="nav-item active">
+        <a class="nav-link" href="#">Home <span class="sr-only">(current)</span></a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" href="#">Link</a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link disabled" href="#">Disabled</a>
+      </li>
+    </ul>
+    <form class="form-inline my-2 my-lg-0">
+      <input class="form-control mr-sm-2" type="text" placeholder="Search">
+      <button class="btn btn-outline-success my-2 my-sm-0" type="submit">Search</button>
+    </form>
+  </div>
+</nav>
+
+{%endcomment%}
+    <nav class="navbar navbar-toggleable-md  navbar-dark fixed-top bg-faded" data-offset-top="2em">
+        <button class="navbar-toggler navbar-toggler-right" type="button" data-toggle="collapse" data-target="#navbarsActuel" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
             <span class="navbar-toggler-icon"></span>
         </button>
+        <a class="navbar-brand" href="{% url 'bienvenue' %}"> MercatLliure </a>
 
-                {% if user.is_authenticated %}
         <div class="collapse navbar-collapse" id="navbarsActuel">
-            <ul class="navbar-nav mr-auto navbar-left">
-                <li class="nav-item active">
-                    <a class="nav-link" href="{% url 'afficheProduitsDispo' %}">Propositions <span
-                            class="sr-only">(current)</span></a></li>
-                <li class="nav-item active"><a class="nav-link" href="{% url 'proposerProduit_entree' %}">Proposer</a></li>
-                <li class="nav-item"><a class="nav-link" href="{% url 'blog:accueil' %}"'>Blog</a> </li>
-                <li class="nav-item"><a class="nav-link" href="{% url 'contact' %}"> Contact</a></li>
-            </ul>
-{%comment%}
-            <form class="form-inline my-2 my-lg-0">
-                <input class="form-control mr-sm-2" placeholder="Search" aria-label="Search" type="text">
-                <button class="btn btn-outline-success my-2 my-sm-0" type="submit">Search</button>
-            </form>
-            {%endcomment%}
-            <ul class=" navbar-nav navbar-right">
-                <li class="nav-item"><a class="nav-link" href="{% url 'profilcourant' %}">profil</a></li>
-                <li class="nav-item"><a class="nav-link" href="{% url 'logout_user' %}">logout</a></li>
+            {% if user.is_authenticated %}
+                <ul class="navbar-nav mr-auto navbar-left">
+                    <li class="nav-item active">
+                        <a class="nav-link" href="{% url 'afficheProduitsDispo' %}">Propositions <span class="sr-only">(current)</span></a></li>
+                    <li class="nav-item active"><a class="nav-link" href="{% url 'proposerProduit_entree' %}">Proposer</a></li>
+                    <li class="nav-item"><a class="nav-link" href="{% url 'blog:accueil' %}"'>Blog</a> </li>
+                    <li class="nav-item"><a class="nav-link" href="{% url 'contact' %}"> Contact</a></li>
+                </ul>
 
-                {% if user.is_superuser %}
-                {% load admin_urls %}
-                <li class="nav-item"><a class="nav-link" href="{% url 'admin:index' %}">admin</a></li>
-                {% endif %}
-            </ul>
-                           {% else %}
-            <ul class=" navbar-nav navbar-right">
+                <form class="form-inline my-2 my-lg-0">
+                    <input class="form-control mr-sm-2" placeholder="Search" aria-label="Search" type="text">
+                    <button class="btn btn-outline-success my-2 my-sm-0" type="submit">Search</button>
+                </form>
+
+                <ul class=" navbar-nav navbar-right">
+                    <li class="nav-item"><a class="nav-link" href="{% url 'profilcourant' %}">profil</a></li>
+                    <li class="nav-item"><a class="nav-link" href="{% url 'logout_user' %}">logout</a></li>
+
+                    {% if user.is_superuser %}
+                    {% load admin_urls %}
+                    <li class="nav-item"><a class="nav-link" href="{% url 'admin:index' %}">admin</a></li>
+                    {% endif %}
+                </ul>
+            {% else %}
+                <ul class="navbar-nav mr-auto navbar-left">
                 <li class="nav-item"><a class="nav-link" href="{% url 'login_user' %}">login</a></li>
-            </ul>
+                </ul>
                 {% endif %}
         </div>
     </nav>

@@ -28,7 +28,7 @@ class Panier(models.Model):
         self.listeProduits.append(produit)
 
 class Profil(models.Model):
-    user = models.OneToOneField(User)
+    user = models.OneToOneField(User, on_delete = models.CASCADE)
     site_web = models.URLField(blank=True)
     description = models.TextField(null=True, default="")
     competences = models.TextField(null=True, default="")
@@ -94,7 +94,7 @@ class ChoixProduits():
 
 # from shop.models import BaseProduct
 class Produit(models.Model):  # , BaseProduct):
-    user = models.ForeignKey(Profil)
+    user = models.ForeignKey(Profil, on_delete=models.CASCADE,)
     date_creation = models.DateTimeField(verbose_name="Date de parution", editable=False)
     date_debut = models.DateField(default=now, verbose_name="Date de debut")
     proposed_renewal_date = datetime.date.today() + datetime.timedelta(weeks=3)
