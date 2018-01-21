@@ -25,6 +25,8 @@ from django.contrib.auth.decorators import login_required
 
 # admin.autodiscover()
 from django.contrib import admin
+from django_filters.views import FilterView
+from .models import Produit, ProductFilter
 
 urlpatterns = [
     url(r'^$', views.bienvenue, name='bienvenue'),
@@ -40,15 +42,28 @@ urlpatterns = [
     url(r'^logout', auth_views.logout, {'next_page': '/'}, name='logout_user', ),
     url(r'^contact', views.contact, name='contact',),
     url(r'^passwordchange', auth_views.password_change, name='password_change',),
-    url(r'^produits/proposerProduit/(?P<typeProduit>[-A-Za-z]+)/$', views.proposerProduit, name='proposerProduit',),
-    url(r'^produits/proposerProduit/', views.proposerProduit_entree, name='proposerProduit_entree',),
+    url(r'^produits/proposer/(?P<typeProduit>[-A-Za-z]+)/$', login_required(views.proposerProduit, login_url='/login/'), name='produit_proposer',),
+    url(r'^produits/proposer/', login_required(views.proposerProduit_entree, login_url='/login/'), name='produit_proposer_entree',),
     #url(r'^shop/', include(shop_urls)), # <-- That's the important bit
-    url(r'^produits/listerProduits/$', login_required(views.ListeProduit.as_view(), login_url='/login/'),
-        name="afficheProduitsDispo"),
 
-    url(r'^produits/listerProduits/categorie/(?P<categorie>[a-z]+)$', login_required(views.ListeProduitFiltre.as_view(), login_url='/login/'),  name="afficheProduitsDispo_categorie"),
-    url(r'^produits/listerProduits/producteur/(?P<producteur>[a-z]+)$',login_required(views.ListeProduitFiltre.as_view(), login_url='/login/'), name='afficheProduitsDispo_producteur'),
-    url(r'^produits/detailProduit/(?P<produit_id>[0-9]+)/$', views.detailProduit, name='detailProduit',),
+# url(r'^list$', views.product_list),
+#     url(r'^list2/$', FilterView.as_view(model=Produit, filterset_class=ProductFilter,)),
+#     url(r'^list3/$', views.ProductList.as_view()),
+#     url(r'^produits/lister/categorie/(?P<categorie>[a-z]+)$', login_required(views.ListeProduitFiltre.as_view(), login_url='/login/'),  name="produit_lister_categorie"),
+#     url(r'^produits/lister/producteur/(?P<producteur>[a-z]+)$',login_required(views.ListeProduitFiltre.as_view(), login_url='/login/'), name='produit_lister_producteur'),
+    url(r'^produits/lister/', login_required(views.ListeProduit.as_view(), login_url='/login/'),
+        name="produit_lister"),
+    url(r'^produits/detail/(?P<produit_id>[0-9]+)/$', views.detailProduit, name='produit_detail',),
+
+    url(r'^produits/modifier/(?P<pk>[0-9]+)/$',
+        login_required(views.ProduitModifier.as_view(), login_url='/login/'), name='produit_modifier', ),
+    url(r'^produits/ajouter/(?P<pk>[0-9]+)/$',
+        login_required(views.ProduitModifier.as_view(), login_url='/login/'), name='produit_ajouterAuPanier', ),
+    url(r'^produits/contacterProducteur/(?P<pk>[0-9]+)/$',
+        login_required(views.ProduitModifier.as_view(), login_url='/login/'), name='produit_contacterProducteur', ),
+    url(r'^produits/supprimer/(?P<pk>[0-9]+)/$',
+        login_required(views.ProduitSupprimer.as_view(), login_url='/login/'), name='produit_supprimer', ),
+
 ]
 
 from django.conf.urls.static import static

@@ -1,0 +1,68 @@
+{% extends 'base.html' %}
+{% block title %}Offres
+
+{% endblock %}
+{%block subtitle%}
+
+<div class="row align-items-center">
+    <div class="col-md-8 textcenter">
+    <div class="btn-group">
+        <a href="?">
+            <button class="btn {% if not 'categorie' in request.GET and not 'producteur' in request.GET %}btn-primary {%endif%}">Tout </button>
+        </a>
+        <a href="?categorie=aliment">
+            <button class="btn {% if request.GET.categorie == 'aliment' %}btn-primary {%endif%}">Aliment </button>
+        </a>
+        <a href="?categorie=vegetal">
+            <button class="btn {% if request.GET.categorie == 'vegetal' %}btn-primary {%endif%}">Végétal </button>
+        </a>
+        <a href="?categorie=service">
+            <button class="btn {% if request.GET.categorie == 'service' %}btn-primary {%endif%}">Service </button>
+        </a>
+        <a href="?categorie=objet">
+            <button class="btn {% if request.GET.categorie == 'objet' %}btn-primary {%endif%}">Objet </button>
+        </a>
+
+  </div>
+     {%if producteur_list %}
+
+    <div class="btn-group">
+        <button type="button" class="btn {% if request.GET.producteur %}btn-primary{%endif%} dropdown-toggle" data-toggle="dropdown">
+        {% if request.GET.producteur %} Producteur : {{request.GET.producteur}} {%else%}Producteur{%endif%} <span class="caret"></span>
+            </button>
+    <ul class="dropdown-menu" role="menu" aria-labelledby="dLabel">
+        {% for producteur in producteur_list %}
+          <li><a href="?producteur={{producteur}}">{{producteur}}</a></li>
+        {% endfor %}
+    </ul>
+    </div>
+    {%endif%}
+
+    </div>
+    <div class="col-md-4 textcenter">
+        <a href="{% url 'produit_proposer_entree' %}">
+            <button type="button" class="btn btn-success">
+                <span class="glyphicon glyphicon-plus"></span>&nbsp; Ajouter une offre
+            </button>
+        </a>
+    </div>
+</div>
+{%endblock subtitle%}
+{% block content %}
+<div class="row is-flex">
+    {% for produit in produits_list %}
+        {% include "bourseLibre/produit_template.html" with produit=produit %}
+    {% cycle '' '' '' '<div class="clearfix visible-lg"></div>' %}
+
+    {% endfor %}
+</div>
+
+
+{% endblock %}
+
+{%comment%}
+
+        {% for producteur in producteur_list %}
+          <li><a href="?producteur={{producteur}}">{{producteur}}</a></li>
+        {% endfor %}
+{%endcomment%}

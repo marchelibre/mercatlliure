@@ -7,14 +7,14 @@ Created on 25 mai 2017
 from django.shortcuts import render, get_object_or_404, HttpResponseRedirect  # render_to_response,
 from .forms import ProduitCreationForm, Produit_aliment_CreationForm, Produit_vegetal_CreationForm, Produit_objet_CreationForm, \
     Produit_service_CreationForm, ProducteurCreationForm, ContactForm
-from .models import Profil, Produit, ChoixProduits, Produit_aliment, Produit_service, Produit_objet, Produit_vegetal
+from .models import Profil, Produit, ChoixProduits, ProductFilter#, Produit_aliment, Produit_service, Produit_objet, Produit_vegetal
 # from django.db.models import Q
 from django.contrib.auth.models import User
 from django.contrib.auth.decorators import login_required
-from django.views.generic import ListView
-
+from django.views.generic import ListView, UpdateView, DeleteView
+from django.urls import reverse_lazy
 from django.core.mail import mail_admins
-from itertools import chain
+# from itertools import chain
 
 
 def bienvenue(request):
@@ -57,19 +57,27 @@ def proposerProduit(request, typeProduit):
                     'produit': produit, 'form': produit_form,
                     'error_message': 'Image file must be PNG, JPG, or JPEG',
                 }
-                return render(request, 'proposerProduit.html', context)
+                return render(request, 'bourseLibre/produit_proposer.html', context)
 
         produit.save()
         # type = type_form.save(commit=False)
         # type.proprietes = produit
         # type.save()
-        return HttpResponseRedirect('/produits/detailProduit/' + str(produit.id))
-    return render(request, 'proposerProduit.html', {"form": type_form, "bgcolor": bgcolor, "typeProduit":typeProduit})
+        return HttpResponseRedirect('/produits/detail/' + str(produit.id))
+    return render(request, 'bourseLibre/produit_proposer.html', {"form": type_form, "bgcolor": bgcolor, "typeProduit":typeProduit})
 
+class ProduitModifier(UpdateView):
+    model = Produit
+    template_name_suffix = '_modifier'
+    fields = ['date_debut','date_expiration','nom_produit', 'description', 'prix', 'unite_prix', 'categorie', 'photo', 'estUneOffre',]# 'souscategorie','etat','type_prix']
+
+class ProduitSupprimer(DeleteView):
+    model = Produit
+    success_url = reverse_lazy('produit_lister')
 
 @login_required(login_url='/login/')
 def proposerProduit_entree(request):
-    return render(request, 'proposerProduit_entree.html',  {"couleurs":ChoixProduits.couleurs})
+    return render(request, 'bourseLibre/produit_proposer_entree.html',  {"couleurs":ChoixProduits.couleurs})
 
 
 # @login_required
@@ -82,7 +90,7 @@ def proposerProduit_entree(request):
 @login_required
 def detailProduit(request, produit_id):
     prod = Produit.objects.get_subclass(pk=produit_id)
-    return render(request, 'detailProduit.html', {'produit': prod})
+    return render(request, 'bourseLibre/produit_detail.html', {'produit': prod})
 
 
 def merci(request, template_name='merci.html'):
@@ -144,8 +152,46 @@ class ListeProduit(ListView):
     context_object_name = "produits_list"
     template_name = "produit_list.html"
     paginate_by = 18
-    queryset = Produit.objects.select_subclasses()
-    ordering = ['categorie']
+
+    def get_queryset(self):
+        qs = Produit.objects.select_subclasses()
+        params = dict(self.request.GET.items())
+        if "producteur" in params:
+            qs = qs.filter(user__user__username=params['producteur'])
+        if "categorie" in params:
+            qs = qs.filter(categorie=params['categorie'])
+        if "prixmax" in params:
+            qs = qs.filter(prix__lt=params['prixmax'])
+        if "prixmin" in params:
+            qs = qs.filter(prix__gtt=params['prixmin'])
+        if "monnaie" in params:
+            qs = qs.filter(unite_prix=params['monnaie'])
+        if "gratuit" in params:
+            qs = qs.filter(unite_prix='don')
+
+        return qs.order_by('categorie','user')
+
+    def get_context_data(self, **kwargs):
+        # Call the base implementation first to get a context
+        context = super().get_context_data(**kwargs)
+        # Add in the publisher
+        listee = Profil.objects.values_list('user__username', flat=True).distinct()
+        context['producteur_list'] = listee
+        return context
+
+# from django_filters import rest_framework as filters
+# from rest_framework import generics
+# from .models import ProduitSerializer
+#
+# class ProductList(generics.ListAPIView):
+#     queryset = Produit.objects.all().select_subclasses()
+#     filter_backends = (filters.DjangoFilterBackend,)
+#     serializer_class = ProduitSerializer
+#
+# def product_list(request):
+#     f = ProductFilter(request.GET, queryset=Produit.objects.all().select_subclasses())
+#     return render(request, 'templateList.html', {'filter': f})
+
     # res = [Produit_aliment.objects.all(), Produit_vegetal.objects.all(), Produit_service.objects.all(), Produit_objet.objects.all()]
     # queryset = list(chain(*res))
     #queryset = qs=[Produit_aliment.objects.all(), Produit_vegetal.objects.all(), Produit_service.objects.all(), Produit_objet.objects.all())
@@ -166,70 +212,75 @@ class ListeProduit(ListView):
     #     context['orderby'] = self.request.GET.get('orderby', 'give-default-value')
     #     return context
 
-class ListeProduitFiltre(ListView):
-    model = Produit
-    context_object_name = "produits_list"
-    template_name = "produit_list.html"
-    paginate_by = 18
-
-    def get_queryset(self):
-        if "categorie" in self.kwargs:
-           # return list(chain(*([Produit_aliment.objects.filter(proprietes__categorie=self.kwargs["categorie"]), Produit_vegetal.objects.filter(proprietes__categorie=self.kwargs["categorie"]), Produit_service.objects.filter(proprietes__categorie=self.kwargs["categorie"]), Produit_objet.objects.filter(proprietes__categorie=self.kwargs["categorie"])])))
-            return Produit.objects.filter(categorie=self.kwargs["categorie"]).select_subclasses()
-        elif "producteur" in self.kwargs:
-           # return list(chain(*([Produit_aliment.objects.filter(proprietes__user__user__username=self.kwargs["producteur"]), Produit_vegetal.objects.filter(proprietes__user__user__username=self.kwargs["producteur"]), Produit_service.objects.filter(proprietes__user__user__username=self.kwargs["producteur"]), Produit_objet.objects.filter(proprietes__user__user__username=self.kwargs["producteur"])])))
-            return Produit.objects.filter(user__user__username=self.kwargs["producteur"]).select_subclasses()
-        else:
-            return Produit.objects.select_subclasses()
-            #return list(chain(*([Produit_aliment.objects.all(), Produit_vegetal.objects.all(), Produit_service.objects.all(), Produit_objet.objects.all()])))
-
-    def get_context_data(self, **kwargs):
-        # Call the base implementation first to get a context
-        context = super().get_context_data(**kwargs)
-        # Add in the publisher
-        if "categorie" in self.kwargs:
-            context['typeFiltre'] = "categorie"
-            context['filtre'] = self.kwargs["categorie"]
-        elif "producteur" in self.kwargs:
-            context['typeFiltre'] = "producteur"
-            context['filtre'] = self.kwargs['producteur']
-        return context
-
-
-class ListeProduitCategorie(ListView):
-    model = Produit
-    context_object_name = "produits_list"
-    template_name = "produit_list.html"
-    paginate_by = 18
-
-    def get_queryset(self):
-        return Produit.objects.filter(categorie=self.kwargs["categorie"])
-
-    def get_context_data(self, **kwargs):
-        # Call the base implementation first to get a context
-        context = super().get_context_data(**kwargs)
-        # Add in the publisher
-        context['typeFiltre'] = "categorie"
-        context['filtre'] = self.kwargs["categorie"]
-        print(context)
-        return context
-
-class ListeProduitProducteur(ListView):
-    model = Produit
-    context_object_name = "produits_list"
-    template_name = "produit_list.html"
-    paginate_by = 18
-
-    def get_queryset(self):
-        return Produit.objects.filter(user__username=self.kwargs["producteur"])
-
-    def get_context_data(self, **kwargs):
-        # Call the base implementation first to get a context
-        context = super().get_context_data(**kwargs)
-        # Add in the publisher
-        context['typeFiltre'] = "producteur"
-        context['filtre'] = context['user.username']
-        return context
+# class ListeProduitFiltre(ListView):
+#     model = Produit
+#     context_object_name = "produits_list"
+#     template_name = "produit_list.html"
+#     paginate_by = 18
+#
+#     def get_queryset(self):
+#         qs = Produit.objects.select_subclasses()
+#         params = dict(self.request.GET.items())
+#         if "filtrer_producteur" in params:
+#             qs = qs.filter(user__user__username=self.request.GET.get('filtrer_producteur') )
+#
+#         if "categorie" in self.kwargs:
+#            # return list(chain(*([Produit_aliment.objects.filter(proprietes__categorie=self.kwargs["categorie"]), Produit_vegetal.objects.filter(proprietes__categorie=self.kwargs["categorie"]), Produit_service.objects.filter(proprietes__categorie=self.kwargs["categorie"]), Produit_objet.objects.filter(proprietes__categorie=self.kwargs["categorie"])])))
+#             return qs.filter(categorie=self.kwargs["categorie"]).select_subclasses()
+#         elif "producteur" in self.kwargs:
+#            # return list(chain(*([Produit_aliment.objects.filter(proprietes__user__user__username=self.kwargs["producteur"]), Produit_vegetal.objects.filter(proprietes__user__user__username=self.kwargs["producteur"]), Produit_service.objects.filter(proprietes__user__user__username=self.kwargs["producteur"]), Produit_objet.objects.filter(proprietes__user__user__username=self.kwargs["producteur"])])))
+#             return qs.filter(user__user__username=self.kwargs["producteur"]).select_subclasses()
+#         else:
+#             return qs
+#             #return list(chain(*([Produit_aliment.objects.all(), Produit_vegetal.objects.all(), Produit_service.objects.all(), Produit_objet.objects.all()])))
+#
+#     def get_context_data(self, **kwargs):
+#         # Call the base implementation first to get a context
+#         context = super().get_context_data(**kwargs)
+#         # Add in the publisher
+#         if "categorie" in self.kwargs:
+#             context['typeFiltre'] = "categorie"
+#             context['filtre'] = self.kwargs["categorie"]
+#         elif "producteur" in self.kwargs:
+#             context['typeFiltre'] = "producteur"
+#             context['filtre'] = self.kwargs['producteur']
+#         return context
+#
+#
+# class ListeProduitCategorie(ListView):
+#     model = Produit
+#     context_object_name = "produits_list"
+#     template_name = "produit_list.html"
+#     paginate_by = 18
+#
+#     def get_queryset(self):
+#         return Produit.objects.filter(categorie=self.kwargs["categorie"])
+#
+#     def get_context_data(self, **kwargs):
+#         # Call the base implementation first to get a context
+#         context = super().get_context_data(**kwargs)
+#         # Add in the publisher
+#         context['typeFiltre'] = "categorie"
+#         context['filtre'] = self.kwargs["categorie"]
+#         print(context)
+#         return context
+#
+# class ListeProduitProducteur(ListView):
+#     model = Produit
+#     context_object_name = "produits_list"
+#     template_name = "produit_list.html"
+#     paginate_by = 18
+#
+#     def get_queryset(self):
+#         return Produit.objects.filter(user__username=self.kwargs["producteur"])
+#
+#     def get_context_data(self, **kwargs):
+#         # Call the base implementation first to get a context
+#         context = super().get_context_data(**kwargs)
+#         # Add in the publisher
+#         context['typeFiltre'] = "producteur"
+#         context['filtre'] = context['user.username']
+#         return context
 
 def contact(request):
     form = ContactForm(request.POST or None)

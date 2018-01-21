@@ -18,13 +18,13 @@
 	<div class="row">
 		<ul class="nav nav-tabs nav-justified">
 			<li>
-				<a href="{% url 'afficheProduitsDispo' %}">Au marché </a>>&nbsp
+				<a href="{% url 'produit_lister' %}">Au marché </a>>&nbsp
 			</li>
 			<li>
-				<a href="{% url 'afficheProduitsDispo_categorie' categorie=produit.categorie %}">{{produit.categorie}}</a> >&nbsp
+				<a href="/produits/lister/?categorie={{produit.categorie}}" categorie=produit.categorie %}">{{produit.categorie}}</a> >&nbsp
 			</li>
 			<li>
-				producteur : <a href="{% url 'afficheProduitsDispo_producteur' producteur=produit.user.user.username %}">{{produit.user.user.username}}</a>
+				producteur : <a href="/produits/lister/?producteur={{produit.user.user.username}}">{{produit.user.user.username}}</a>
 			</li>
 		</ul>
 	</div>
@@ -53,16 +53,16 @@
 		{% if user.id != produit.user.user.id%}
 		<div class="col-md-4 paddingbase">
 
-			<a href="#" class="btn btn-primary btn-lg btn-block" type="button">
+			<a href="{%url 'produit_ajouterAuPanier' produit.id %}" class="btn btn-primary btn-lg btn-block" type="button">
 				Ajouter au panier</a>
-			<a href="#" class="btn btn-block btn-success btn-lg" type="button">Contacter le producteur</a>
+			<a href="{%url 'produit_contacterProducteur' produit.id %}" class="btn btn-success btn-block  btn-lg" type="button">Contacter le producteur</a>
 		</div>
 		{%else%}
 		<div class="col-md-4 paddingbase">
 
-			<a href="#" class="btn btn-warning btn-lg btn-block" type="button">
+			<a href="{%url 'produit_modifier' produit.id %}" class="btn btn-warning btn-lg btn-block" type="button">
 				Modifier l'offre</a>
-			<a href="#" class="btn btn-danger btn-lg btn-block" type="button">
+			<a href="{%url 'produit_supprimer' produit.id %}" class="btn btn-danger btn-lg btn-block" type="button">
 				Supprimer l'offre</a>
 		</div>
 		{%endif%}

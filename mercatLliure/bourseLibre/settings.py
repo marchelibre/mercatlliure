@@ -49,6 +49,8 @@ INSTALLED_APPS = (
     'bourseLibre',
     'blog',
     'django_extensions',
+    'django_filters',
+    'rest_framework',
     #'sitetree',
     'panier',
     #'location-field',
@@ -136,6 +138,7 @@ USE_L10N = True
 USE_TZ = True
 
 DATE_FORMAT = "d/M/y"
+
 LOGIN_URL = '/login/'
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/1.8/howto/static-files/

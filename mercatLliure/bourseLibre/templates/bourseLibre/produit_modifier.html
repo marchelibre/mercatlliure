@@ -1,9 +1,8 @@
 {% extends 'base.html' %}
-{% load app_filters %}
-{% block title %}Partager{% endblock %}
+{% block title %}Modifier{% endblock %}
 {% block subtitle %}
 <style>.soustitre,.bodycontenu{background-color: {{ bgcolor }};}</style>
-Quel {{ typeProduit }} proposez-vous ?
+Modifier
 
 {% endblock %}
 {% block content %}
@@ -13,14 +12,10 @@ Quel {{ typeProduit }} proposez-vous ?
     {% csrf_token %}
     <table>
     {{ form.as_table }}
-    {% if form2 %}
-        {{ form2.as_table }}
-    {%endif%}
-
     </table>
         <div class="btn-group">
-            <button onclick="window.history.back();" class="btn btn-warning" type="button">Annuler</button>
-                <button type="submit" class="btn btn-success textcenter btn-lg btn-block">Offrir</button>
+            <button onclick="window.history.back();" class="btn btn-warning textcenter btn-lg" type="button">Annuler</button>
+                <button type="submit" class="btn btn-success textcenter btn-lg btn-block">Enregistrer les modifictaions</button>
         </div>
 </form>
 </div>

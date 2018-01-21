@@ -10,6 +10,8 @@ from django.utils.timezone import now
 from address.models import AddressField
 import datetime
 from model_utils.managers import InheritanceManager
+import django_filters
+from django.urls import reverse
 
 # from datetimewidget.widgets import DateTimeWidget
 
@@ -39,7 +41,7 @@ class Profil(models.Model):
     #panier = models.OneToOneField(Panier,on_delete=models.CASCADE,)
 
     def __str__(self):
-        return "utilisateur:" + self.user.username
+        return self.user.username
 
     def save(self, *args, **kwargs):
         ''' On save, update timestamps '''
@@ -61,37 +63,38 @@ def save_user_profile(sender, instance, **kwargs):
 
 
 class ChoixProduits():
-    couleurs = {'aliment':'#5f99de','vegetal':'#41b746','service':'#a68335','objet':'#c3bb4b'}
+    #couleurs = {'aliment':'#D8C457','vegetal':'#4CAF47','service':'#BE373A','objet':'#5B4694'}
+    couleurs = {'aliment':'#D8AD57','vegetal':'#A9CB52','service':'#DA7BE4','objet':'#80B2C0'}
     choix = {
     'aliment': {
         'souscategorie': (('légumes', 'légumes'), ('fruits', 'fruits'), ('boisson', 'boisson'), ('herbes', 'herbes'),
-                          ('condiments', 'condiments'), ('viande', 'viande'), ('poisson', 'poissson'),
+                          ('condiments', 'condiments'), ('viande', 'viande'), ('poisson', 'poisson'),
                           ('boulangerie', 'boulangerie'), ('patisserie', 'patisserie'), ('autre', 'autre')),
         'etat': (('fr', 'frais'), ('se', 'sec'), ('cs', 'conserve')),
-        'type_prix': (('kg', '/kg'), ('un', '/unité'), ('li', '/litre')),
+        'type_prix': (('kg', 'kg'), ('un', 'unité'), ('li', 'litre')),
     },
     'vegetal': {
         'souscategorie': (('graines', 'graines'), ('fleurs', 'fleurs'), ('plantes', 'plantes')),
         'etat': (('frais', 'frais'), ('séché', 'séché')),
-        'type_prix': (('kg', '/kg'), ('un', '/unité'), ('li', '/litre')),
+        'type_prix': (('kg', 'kg'), ('un', 'unité'), ('li', 'litre')),
     },
     'service': {
         'souscategorie': (('jardinier', 'jardinier'), ('informaticien', 'informaticien'), ('electricen', 'electricien'),
                           ('plombier', 'plombier'), ('mécanicien', 'mécanicien'), ('autre', 'autre')),
         'etat': (('excellent', 'excellent'), ('bon', 'bon'), ('moyen', 'moyen'), ('nul', 'nul')),
-        'type_prix': (('kg', '/kg'), ('un', '/unité'), ('li', '/litre')),
+        'type_prix': (('kg', 'kg'), ('un', 'unité'), ('li', 'litre')),
     },
     'objet': {
         'souscategorie': (
         ('materiel', 'materiel'), ('vehicule', 'vehicule'), ('multimedia', 'multimedia'), ('mobilier', 'mobilier'),
         ('autre', 'autre'),),
         'etat': (('excellent', 'excellent'), ('bon', 'bon'), ('moyen', 'moyen'), ('mauvais', 'mauvais')),
-        'type_prix': (('kg', '/kg'), ('un', '/unité'), ('li', '/litre')),
+        'type_prix': (('kg', 'kg'), ('un', 'unité'), ('li', 'litre')),
     }
 }
 
 #from polymorphic.models import PolymorphicModel
-
+from django.template.defaultfilters import slugify
 # from shop.models import BaseProduct
 class Produit(models.Model):  # , BaseProduct):
     user = models.ForeignKey(Profil, on_delete=models.CASCADE,)
@@ -105,19 +108,28 @@ class Produit(models.Model):  # , BaseProduct):
     stock_initial = models.FloatField(verbose_name="Quantité disponible", default=1, max_length=250,
                                       validators=[MinValueValidator(1), ])
     stock_courant = models.FloatField(default=1, max_length=250, validators=[MinValueValidator(0), ])
-    prix = models.DecimalField(max_digits=5, decimal_places=2, default=1, validators=[MinValueValidator(0), ])
+    prix = models.DecimalField(max_digits=4, decimal_places=2, default=1, validators=[MinValueValidator(0), ])
     unite_prix = models.CharField(
-        max_length=6,
-        choices=(('lliure', 'lliure'), ('eugros', 'eugros'), ('heures', 'heures'), ('troc', 'troc')),
+        max_length=8,
+        choices=(('don', 'don'),('soudaqui', 'soudaqui'), ('eugros', 'eugros'), ('heures', 'heures'), ('troc', 'troc')),
         default='lliure', verbose_name="monnaie"
     )
 
+    CHOIX_CATEGORIE = (('aliment', 'aliment'),('vegetal', 'végétal'), ('service', 'service'),
+                                          ('objet', 'objet'))
     categorie = models.CharField(max_length=20,
-                                 choices=(('aliment', 'aliment'),('vegetal', 'vegetal'), ('service', 'service'),
-                                          ('objet', 'objet')),
+                                 choices=CHOIX_CATEGORIE,
                                  default='aliment')
     photo = models.ImageField(blank=True, upload_to="imagesProduits/")
+
+    estUneOffre = models.BooleanField(default=True)
+
     objects = InheritanceManager()
+
+    @property
+    def slug(self):
+        return slugify(self.nom_produit)
+
     # detail_categorie = None
     # type = "defaut"
 
@@ -134,8 +146,53 @@ class Produit(models.Model):  # , BaseProduct):
         ''' On save, update timestamps '''
         if not self.id:
             self.date_creation = timezone.now()
+            self.stock_courant = self.stock_initial
 
         return super(Produit, self).save(*args, **kwargs)
+
+    def get_absolute_url(self):
+        return reverse('produit_detail', kwargs={'produit_id':self.id})
+
+
+from rest_framework import serializers
+class ProduitSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Produit
+        fields = ('categorie','nom_produit','description','prix')
+
+
+class ProductFilter(django_filters.FilterSet):
+    #nom_produit = django_filters.CharFilter(lookup_expr='iexact')
+    # date_creation = django_filters.DateFromToRangeFilter(name='date_creation',)
+    # date_debut = django_filters.DateFromToRangeFilter(name='date_debut')
+    # date_expiration = django_filters.DateFromToRangeFilter(name='date_expiration')
+    categorie = django_filters.ChoiceFilter(label='categorie', lookup_expr='exact', )
+    user__user__username = django_filters.ModelChoiceFilter(label='producteur', queryset=Profil.objects.all())
+    nom_produit = django_filters.CharFilter(label='titre', lookup_expr='contains')
+    description = django_filters.CharFilter(label='description', lookup_expr='contains')
+    prixmin = django_filters.NumberFilter(label='prix min', lookup_expr='gt', name="prix")
+    prixmax = django_filters.NumberFilter(label='prix max', lookup_expr='lt', name="prix")
+    # date_debut = django_filters.DateFromToRangeFilter(widget=RangeWidget(attrs={'placeholder': 'YYYY/MM/DD'}), label='date de début')
+    date_debut = django_filters.TimeRangeFilter(label='date de début')
+    # date_debut = django_filters.DateFilter(label='date de début')
+
+
+    class Meta:
+        model = Produit
+        fields = ['categorie', 'user__user__username', 'nom_produit', "description", "prixmin","prixmax","date_debut"]
+        # fields = {
+        #      'categorie':['exact'],
+        #     'nom_produit':['contains'],
+        #     'description':['contains'],
+        #     # 'date_creation': ['exact'],
+        #     # 'date_debut': ['exact'],
+        #     # 'date_expiration': ['exact'],
+        #      'prix':['gte','lte'],
+        # }
+        exclude=('photo',)
+
+
+
 
 class Produit_aliment(Produit):  # , BaseProduct):
     #proprietes = models.OneToOneField(Produit,on_delete=models.CASCADE, parent_link=True, )

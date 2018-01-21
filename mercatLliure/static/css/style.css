@@ -5,7 +5,9 @@ body {
     margin: auto;
     width: 90%;
     padding: 10px;
-    font-family: cursive;
+    /*font-family: cursive;*/
+    font-family: serif;
+    /*font-family: system-ui;*/
 }
 .textcenter{
     text-align: center;
@@ -73,7 +75,29 @@ ul.errorlist > li {
     padding: 10px 10px 10px 10px;
 }
 
-
+#parent {
+    text-align:center;
+    background-color:blue;
+    height:400px;
+    width:600px;
+}
+.block {
+    height:100px;
+    width:200px;
+    text-align:left;
+}
+.center {
+    margin:auto;
+    background-color:green;
+}
+.left {
+    margin:auto auto auto 0;
+    background-color:red;
+}
+.right {
+    margin:auto 0 auto auto;
+    background-color:yellow;
+}
 .infos{
     font-size:small;
 }
@@ -84,9 +108,6 @@ ul.errorlist > li {
 }
 .col_cat a:link, a:visited {
     color: black;
-}
-.extratest:hover{
-opacity: 0.7;
 }
 /*
 .col_aliment{
@@ -113,10 +134,11 @@ opacity: 0.7;
     background-color:grey;
 }
 .offre{
-    padding-bottom:10px;
-    border-radius: 0.8em;
+    padding-bottom:5px;
+    border-radius: 0.3em;
+     align-items: top;
 }
 .offre:hover{
-opacity:0.85;
+    opacity:0.85;
     border-radius: 1em;
 }

@@ -37,8 +37,8 @@
             {% if user.is_authenticated %}
                 <ul class="navbar-nav mr-auto navbar-left">
                     <li class="nav-item active">
-                        <a class="nav-link" href="{% url 'afficheProduitsDispo' %}">Propositions <span class="sr-only">(current)</span></a></li>
-                    <li class="nav-item active"><a class="nav-link" href="{% url 'proposerProduit_entree' %}">Proposer</a></li>
+                        <a class="nav-link" href="{% url 'produit_lister' %}">Propositions <span class="sr-only">(current)</span></a></li>
+                    <li class="nav-item active"><a class="nav-link" href="{% url 'produit_proposer_entree' %}">Proposer</a></li>
                     <li class="nav-item"><a class="nav-link" href="{% url 'blog:accueil' %}"'>Blog</a> </li>
                     <li class="nav-item"><a class="nav-link" href="{% url 'contact' %}"> Contact</a></li>
                 </ul>

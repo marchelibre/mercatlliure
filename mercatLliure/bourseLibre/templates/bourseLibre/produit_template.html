@@ -1,0 +1,31 @@
+<div class="col-sm-3 col-lg-3 offre d-flex flex-column justify-content-between " style="background-color:{{ produit.couleur }}; border:{%if produit.estUneOffre == True %} black {%else%}white{%endif%} medium solid">
+
+    {%comment%}
+    <div class="col-sm-3 col-lg-3 offre d-flex flex-column justify-content-between " style="background-color:{{ produit.couleur }}">
+     {%endcomment%}
+        <div class="row extratest align-items-start">
+        <div class="col-sm-12">
+        <a href="{% url 'produit_detail' produit.id %}" >
+           <div class="thumbnail">
+                <img src="{{ produit.pĥoto.url }}" class="img-responsive">
+            </div>
+            <div class="caption textcenter ">
+                <small> ({{ produit.souscategorie }})</small>
+                <h2>{{ produit.nom_produit|truncatechars:12 }} </h2>
+                <p> par: {{ produit.user.user.username }}</p>
+            </div>
+        </div>
+        </div>
+        <div class="row align-items-end">
+        <div class="col-sm-12 textcenter">
+                {% if produit.unite_prix == 'don' %}
+                <p>gratuit</p>
+                {%else%}
+                <p> {{ produit.prix }} &nbsp {{ produit.unite_prix }}/{{ produit.type_prix }}</p>
+                {%endif%}
+                <a href="{% url 'produit_detail' produit.id %}" class="btn btn-primary btn-sm"
+                   role="button">voir en détail...</a>
+            </div>
+        </div>
+        </a>
+    </div>
