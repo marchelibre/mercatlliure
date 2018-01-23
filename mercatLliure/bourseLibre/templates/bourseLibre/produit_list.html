@@ -35,9 +35,15 @@
           <li><a href="?producteur={{producteur}}">{{producteur}}</a></li>
         {% endfor %}
     </ul>
+        {% if request.GET.producteur %}
+            <a type="button" class = 'btn infos' href="{%url 'profil_nom' request.GET.producteur %}">Voir son profil...</a>
+        {%endif%}
+
     </div>
+    <div class="col-md-4 textcenter">
     {%endif%}
 
+    </div>
     </div>
     <div class="col-md-4 textcenter">
         <a href="{% url 'produit_proposer_entree' %}">
@@ -49,7 +55,7 @@
 </div>
 {%endblock subtitle%}
 {% block content %}
-<div class="row is-flex">
+<div class="row listOffres">
     {% for produit in produits_list %}
         {% include "bourseLibre/produit_template.html" with produit=produit %}
     {% cycle '' '' '' '<div class="clearfix visible-lg"></div>' %}

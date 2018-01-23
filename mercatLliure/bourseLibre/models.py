@@ -13,21 +13,26 @@ from model_utils.managers import InheritanceManager
 import django_filters
 from django.urls import reverse
 
+from django.utils.translation import ugettext_lazy as _
+#from django.contrib.contenttypes.models import ContentType
+import decimal
 # from datetimewidget.widgets import DateTimeWidget
 
-class Panier(models.Model):
-    listeProduits = []
-    date_creation = models.DateTimeField(verbose_name="Date de création", editable=False)
-    etat = "attente"
+# class Panier(models.Model):
+#     listeProduits = []
+#     date_creation = models.DateTimeField(verbose_name="Date de création", editable=False)
+#     etat = "attente"
+#
+#     def save(self, *args, **kwargs):
+#         ''' On save, update timestamps '''
+#         if not self.id:
+#             self.date_creation = timezone.now()
+#         return super(Panier, self).save(*args, **kwargs)
+#
+#     def add_produit(self, produit):
+#         self.listeProduits.append(produit)
 
-    def save(self, *args, **kwargs):
-        ''' On save, update timestamps '''
-        if not self.id:
-            self.date_creation = timezone.now()
-        return super(Panier, self).save(*args, **kwargs)
 
-    def add_produit(self, produit):
-        self.listeProduits.append(produit)
 
 class Profil(models.Model):
     user = models.OneToOneField(User, on_delete = models.CASCADE)
@@ -38,23 +43,30 @@ class Profil(models.Model):
     avatar = models.ImageField(null=True, blank=True, upload_to="avatars/")
     inscrit_newsletter = models.BooleanField(default=False)
     date_registration = models.DateTimeField(verbose_name="Date de création", editable=False)
-    #panier = models.OneToOneField(Panier,on_delete=models.CASCADE,)
 
     def __str__(self):
+        return self.user.username
+
+    def __unicode__(self):
         return self.user.username
 
     def save(self, *args, **kwargs):
         ''' On save, update timestamps '''
         if not self.id:
-            self.date_registration = timezone.now()
-            self.panier = Panier()
+            self.date_registration = now()
         return super(Profil, self).save(*args, **kwargs)
 
+    def get_nom_class(self):
+        return "Profil"
+
+    def get_absolute_url(self):
+        return reverse('profil', kwargs={'user_id':self.id})
 
 @receiver(post_save, sender=User)
 def create_user_profile(sender, instance, created, **kwargs):
     if created:
         Profil.objects.create(user=instance)
+        Panier.objects.create(user=Profil.objects.get(user=instance))
 
 
 @receiver(post_save, sender=User)
@@ -62,34 +74,36 @@ def save_user_profile(sender, instance, **kwargs):
     instance.profil.save()
 
 
+
 class ChoixProduits():
     #couleurs = {'aliment':'#D8C457','vegetal':'#4CAF47','service':'#BE373A','objet':'#5B4694'}
-    couleurs = {'aliment':'#D8AD57','vegetal':'#A9CB52','service':'#DA7BE4','objet':'#80B2C0'}
+    couleurs = {'aliment':'#D8AD57','vegetal':'#A9CB52','service':'#E66562','objet':'#80B2C0'}
+    typePrixUnite =  (('kg', 'kg'), ('100g', '100g'), ('10g', '10g'),('g', 'g'),  ('un', 'unité'), ('li', 'litre'))
     choix = {
     'aliment': {
         'souscategorie': (('légumes', 'légumes'), ('fruits', 'fruits'), ('boisson', 'boisson'), ('herbes', 'herbes'),
                           ('condiments', 'condiments'), ('viande', 'viande'), ('poisson', 'poisson'),
                           ('boulangerie', 'boulangerie'), ('patisserie', 'patisserie'), ('autre', 'autre')),
         'etat': (('fr', 'frais'), ('se', 'sec'), ('cs', 'conserve')),
-        'type_prix': (('kg', 'kg'), ('un', 'unité'), ('li', 'litre')),
+        'type_prix': typePrixUnite,
     },
     'vegetal': {
         'souscategorie': (('graines', 'graines'), ('fleurs', 'fleurs'), ('plantes', 'plantes')),
         'etat': (('frais', 'frais'), ('séché', 'séché')),
-        'type_prix': (('kg', 'kg'), ('un', 'unité'), ('li', 'litre')),
+        'type_prix': typePrixUnite,
     },
     'service': {
         'souscategorie': (('jardinier', 'jardinier'), ('informaticien', 'informaticien'), ('electricen', 'electricien'),
                           ('plombier', 'plombier'), ('mécanicien', 'mécanicien'), ('autre', 'autre')),
         'etat': (('excellent', 'excellent'), ('bon', 'bon'), ('moyen', 'moyen'), ('nul', 'nul')),
-        'type_prix': (('kg', 'kg'), ('un', 'unité'), ('li', 'litre')),
+        'type_prix': (('h', 'heure'), ('un', 'unité')),
     },
     'objet': {
         'souscategorie': (
         ('materiel', 'materiel'), ('vehicule', 'vehicule'), ('multimedia', 'multimedia'), ('mobilier', 'mobilier'),
         ('autre', 'autre'),),
         'etat': (('excellent', 'excellent'), ('bon', 'bon'), ('moyen', 'moyen'), ('mauvais', 'mauvais')),
-        'type_prix': (('kg', 'kg'), ('un', 'unité'), ('li', 'litre')),
+        'type_prix': typePrixUnite,
     }
 }
 
@@ -115,8 +129,7 @@ class Produit(models.Model):  # , BaseProduct):
         default='lliure', verbose_name="monnaie"
     )
 
-    CHOIX_CATEGORIE = (('aliment', 'aliment'),('vegetal', 'végétal'), ('service', 'service'),
-                                          ('objet', 'objet'))
+    CHOIX_CATEGORIE = (('aliment', 'aliment'),('vegetal', 'vegetal'), ('service', 'service'), ('objet', 'objet'))
     categorie = models.CharField(max_length=20,
                                  choices=CHOIX_CATEGORIE,
                                  default='aliment')
@@ -145,7 +158,7 @@ class Produit(models.Model):  # , BaseProduct):
     def save(self, *args, **kwargs):
         ''' On save, update timestamps '''
         if not self.id:
-            self.date_creation = timezone.now()
+            self.date_creation = now()
             self.stock_courant = self.stock_initial
 
         return super(Produit, self).save(*args, **kwargs)
@@ -153,12 +166,24 @@ class Produit(models.Model):  # , BaseProduct):
     def get_absolute_url(self):
         return reverse('produit_detail', kwargs={'produit_id':self.id})
 
+    def get_type_prix(self):
+        return Produit.objects.get_subclass(id=self.id).type_prix
 
-from rest_framework import serializers
-class ProduitSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Produit
-        fields = ('categorie','nom_produit','description','prix')
+    def get_prix(self):
+        if self.unite_prix == "don":
+            return 0
+        else:
+            return self.prix
+
+    def get_nom_class(self):
+        return "Produit"
+
+
+# from rest_framework import serializers
+# class ProduitSerializer(serializers.ModelSerializer):
+#     class Meta:
+#         model = Produit
+#         fields = ('categorie','nom_produit','description','prix')
 
 
 class ProductFilter(django_filters.FilterSet):
@@ -194,12 +219,9 @@ class ProductFilter(django_filters.FilterSet):
 
 
 
+
 class Produit_aliment(Produit):  # , BaseProduct):
-    #proprietes = models.OneToOneField(Produit,on_delete=models.CASCADE, parent_link=True, )
     type = 'aliment'
-    # categorie = models.CharField(max_length=20,
-    #                              choices=(('aliment', 'aliment'),),
-    #                              default='aliment')
     couleur = models.CharField(
         max_length=20,
         choices=((ChoixProduits.couleurs['aliment'],ChoixProduits.couleurs['aliment']),),
@@ -220,19 +242,15 @@ class Produit_aliment(Produit):  # , BaseProduct):
         choices=ChoixProduits.choix[type]['type_prix'],
         default=ChoixProduits.choix[type]['type_prix'][0][0], verbose_name="par"
     )
-    # def save(self, *args, **kwargs):
-    #     ''' On save, update timestamps '''
-    #     if not self.id:
-    #         self.date_creation = timezone.now()
-    #     return super(Produit_aliment, self).save(*args, **kwargs)
+    def get_unite_prix(self):
+        if self.unite_prix == "don":
+            return self.unite_prix
+        else:
+            return self.unite_prix + "/" + self.type_prix
 
 
 class Produit_vegetal(Produit):  # , BaseProduct):
-    #proprietes = models.OneToOneField(Produit,on_delete=models.CASCADE, parent_link=True )
     type = 'vegetal'
-    # categorie = models.CharField(max_length=20,
-    #                              choices=(('vegetal', 'vegetal'),),
-    #                              default='vegetal')
     couleur = models.CharField(
         max_length=20,
         choices=((ChoixProduits.couleurs['vegetal'],ChoixProduits.couleurs['vegetal']),),
@@ -253,19 +271,15 @@ class Produit_vegetal(Produit):  # , BaseProduct):
         choices=ChoixProduits.choix[type]['type_prix'],
         default=ChoixProduits.choix[type]['type_prix'][0][0], verbose_name="par"
     )
-    # def save(self, *args, **kwargs):
-    #     ''' On save, update timestamps '''
-    #     if not self.id:
-    #         self.date_creation = timezone.now()
-    #     return super(Produit_vegetaux, self).save(*args, **kwargs)
+    def get_unite_prix(self):
+        if self.unite_prix == "don":
+            return self.unite_prix
+        else:
+            return self.unite_prix + "/" + self.type_prix
 
 
 class Produit_service(Produit):  # , BaseProduct):
-    #proprietes = models.OneToOneField(Produit,on_delete=models.CASCADE, parent_link=True)
     type = 'service'
-    # categorie = models.CharField(max_length=20,
-    #                              choices=(('service', 'service'),),
-    #                              default='service')
     couleur = models.CharField(
         max_length=20,
         choices=((ChoixProduits.couleurs['service'],ChoixProduits.couleurs['service']),),
@@ -286,19 +300,15 @@ class Produit_service(Produit):  # , BaseProduct):
         choices=ChoixProduits.choix["service"]['type_prix'],
         default=ChoixProduits.choix["service"]['type_prix'][0][0], verbose_name="par"
     )
-    # def save(self, *args, **kwargs):
-    #     ''' On save, update timestamps '''
-    #     if not self.id:
-    #         self.date_creation = timezone.now()
-    #     return super(Produit_services, self).save(*args, **kwargs)
+    def get_unite_prix(self):
+        if self.unite_prix == "don":
+            return self.unite_prix
+        else:
+            return self.unite_prix + "/" + self.type_prix
 
 
 class Produit_objet(Produit):  # , BaseProduct):
-    #proprietes = models.OneToOneField(Produit,on_delete=models.CASCADE, parent_link=True)
     type = 'objet'
-    # categorie = models.CharField(max_length=20,
-    #                              choices=(('objet', 'objet'),),
-    #                              default='objet')
     couleur = models.CharField(
         max_length=20,
         choices=((ChoixProduits.couleurs['objet'],ChoixProduits.couleurs['objet']),),
@@ -319,8 +329,142 @@ class Produit_objet(Produit):  # , BaseProduct):
         choices=ChoixProduits.choix[type]['type_prix'],
         default=ChoixProduits.choix[type]['type_prix'][0][0], verbose_name="par"
     )
-    # def save(self, *args, **kwargs):
-    #     ''' On save, update timestamps '''
-    #     if not self.id:
-    #         self.date_creation = timezone.now()
-    #     return super(Produit_objets, self).save(*args, **kwargs)
+    def get_unite_prix(self):
+        if self.unite_prix == "don":
+            return self.unite_prix
+        else:
+            return self.unite_prix + "/" + self.type_prix
+
+
+class ItemAlreadyExists(Exception):
+    pass
+
+class ItemDoesNotExist(Exception):
+    pass
+
+
+class Panier(models.Model):
+    date_creation = models.DateTimeField(verbose_name=_('date de création '), editable=False)
+    user = models.ForeignKey(Profil, on_delete=models.CASCADE)
+    checked_out = models.BooleanField(default=False, verbose_name=_('checked out'))
+
+    etat = models.CharField(
+        max_length=8,
+        choices=(('a', 'en cours'),('ok', 'validé'), ('t', 'terminé'), ('c', 'annulé')),
+        default='a', verbose_name="état"
+    )
+
+    def save(self, *args, **kwargs):
+        ''' On save, update timestamps '''
+        if not self.id:
+            self.date_creation = now()
+        return super(Panier, self).save(*args, **kwargs)
+
+    class Meta:
+        verbose_name = _('panier')
+        verbose_name_plural = _('paniers')
+        ordering = ('-date_creation',)
+
+    def __unicode__(self):
+        #return unicode(self.date_creation)
+        return self.date_creation
+
+    def __iter__(self):
+        for item in self.item_set.all():
+            yield item
+
+    def get_nom_class(self):
+        return "Panier"
+
+
+    def add(self, produit, unit_price, quantite=1):
+        try:
+            item = Item.objects.get(
+                panier=self,
+                produit=produit,
+            )
+        except Item.DoesNotExist:
+            item = Item()
+            item.panier = self
+            item.produit = produit
+            item.quantite = quantite
+            item.save()
+        else: #ItemAlreadyExists
+            item.quantite += decimal.Decimal(quantite).quantize(decimal.Decimal('.001'), rounding=decimal.ROUND_HALF_UP)
+            item.save()
+
+    def remove(self, produit):
+        try:
+            item = Item.objects.get(
+                panier=self,
+                produit=produit,
+            )
+        except Item.DoesNotExist:
+            raise ItemDoesNotExist
+        else:
+            item.delete()
+
+    def update(self, produit, quantite):
+        try:
+            item = Item.objects.get(
+                panier=self,
+                produit=produit,
+            )
+        except Item.DoesNotExist:
+            raise ItemDoesNotExist
+        else: #ItemAlreadyExists
+            if quantite == 0:
+                item.delete()
+            else:
+                item.quantite =  decimal.Decimal(quantite).quantize(decimal.Decimal('.001'), rounding=decimal.ROUND_HALF_UP)
+                item.save()
+
+    def total_quantite(self):
+        result = 0
+        for item in self.item_set.all():
+            result += 1 * item.quantite
+        return result
+
+    def total_prix(self):
+        result = 0
+        for item in self.item_set.all():
+            result += item.total_prix
+        return result
+
+    def clear(self):
+        for item in self.item_set.all():
+            item.delete()
+
+    total_prix = property(total_prix)
+    total_quantite = property(total_quantite)
+
+class ItemManager(models.Manager):
+    def get(self, *args, **kwargs):
+        # if 'produit' in kwargs:
+        #     kwargs['produit'] = Produit.objects.get(type(kwargs['produit'])).select_subclasses()
+        #     kwargs['object_id'] = kwargs['produit'].pk
+        #     del(kwargs['produit'])
+        return super(ItemManager, self).get(*args, **kwargs)
+
+
+
+class Item(models.Model):
+    panier = models.ForeignKey(Panier, verbose_name=_('panier'), on_delete=models.CASCADE)
+    quantite = models.DecimalField(verbose_name=_('quantite'),decimal_places=3,max_digits=6)
+    produit = models.ForeignKey(Produit, on_delete=models.CASCADE)
+
+    objects = ItemManager()
+
+    class Meta:
+        verbose_name = _('item')
+        verbose_name_plural = _('items')
+        ordering = ('panier',)
+
+    def __unicode__(self):
+        return u'%s units of %s' % (self.quantite, self.produit.nom_produit)
+
+    def total_prix(self):
+        if self.produit.unite_prix == 'don':
+            return 0
+        return self.quantite * self.produit.get_prix()
+    total_prix = property(total_prix)

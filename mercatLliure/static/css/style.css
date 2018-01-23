@@ -28,7 +28,7 @@ ul.errorlist > li {
 .row{
     margin-right: 15px;
     margin-left: 15px;
-    padding: 5px 5px 5px 5px;
+    padding: 5px;
 }
 /*.breadcrumb span, .breadcrumb div {display:inline-block!important; float:left!important}*/
 .navbar {
@@ -45,7 +45,7 @@ ul.errorlist > li {
     margin-top: 5em;
     margin-bottom: 2em;
     border-radius: 0.4em;
-    border: 3px solid #053200;
+
     padding: 10px 10px 10px 10px;
 }
 /*
@@ -62,18 +62,23 @@ ul.errorlist > li {
 }
 
 .soustitre{
-    padding: 7em 2em 7em 2em;
+    padding: 5px;
     border-radius: 0.4em;
     /*rder: 1px solid #053200;*/
-    padding: 10px 10px 10px 10px;
+    border:10px red;
 }
+
 .bodycontenu{
-    padding: 7em 2em 7em 2em;
     padding-bottom: 2em;
-    border-radius: 0.5em;
+    border-radius: 0.4em;
     /*border: 1px solid #053200;*/
-    padding: 10px 10px 10px 10px;
+    padding: 10px ;
 }
+.bodycontenucomplet{
+    padding: 10px ;
+    border-radius: 0.4em;
+    box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+    }
 
 #parent {
     text-align:center;
@@ -103,13 +108,26 @@ ul.errorlist > li {
 }
 
 .col_cat{
-    border-radius: 1em;
-    padding: 10px 15px 10px 15px;
+    padding: 25px;
+    margin:5px;
+    border:1px ;
+    width:400px;
+    border:2px grey solid;
+    border-radius: 0.4em;
+    flex:1 1 auto;
+    box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
 }
 .col_cat a:link, a:visited {
     color: black;
+    text-decoration: none;
 }
-/*
+
+.col_cat:hover{
+    opacity:0.85;
+    border-radius: 1em;
+    box-shadow: 0 10px 10px 0px grey;
+    text-decoration: none;
+}
 .col_aliment{
    /* border-left: 6px solid #CEECF5;*/
     color: black;/*#6666ff*/
@@ -133,12 +151,54 @@ ul.errorlist > li {
 .tablecustom{
     background-color:grey;
 }
-.offre{
+
+.tablepanier{
+    background-color:#87ceeb;
+}
+
+.offre_entree{
     padding-bottom:5px;
     border-radius: 0.3em;
-     align-items: top;
+    align-items: top;
+    margin:5px;  /* and that, will result in a 10px gap */
+    border:1px red solid;
 }
+.offre_entree:hover{
+    opacity:0.85;
+    border-radius: 1em;
+    box-shadow: 0 10px 10px 0px grey;
+}
+.offre{
+    border-radius: 0.3em;
+    padding-bottom:5px;
+    align-items: top;
+    height: 250px;
+    width:300px;
+    border:1px grey solid;
+    flex:1 1 auto;
+    text-align:center;
+    margin:5px;  /* and that, will result in a 10px gap */
+}
+
 .offre:hover{
     opacity:0.85;
     border-radius: 1em;
+    box-shadow: 0 10px 10px 0px grey;
+    text-decoration: none;
+}
+
+.listOffres{
+    display: flex ;
+    flex-flow: row wrap;
+    justify-content: center;
+    display: -webkit-box;
+	display: -webkit-flex;
+	display: -moz-box;
+	display: -ms-flexbox;
+	display: flex;
+    padding:5px;
+}
+
+.detailProduit{
+    box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
 }

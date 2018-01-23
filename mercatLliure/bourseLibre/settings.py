@@ -43,6 +43,7 @@ INSTALLED_APPS = (
     'django.contrib.admindocs',
     'django.contrib.sites',
     'bootstrap','fontawesome',
+    'haystack',
     'debug_toolbar',
     'model_utils',
     'address',
@@ -52,7 +53,7 @@ INSTALLED_APPS = (
     'django_filters',
     'rest_framework',
     #'sitetree',
-    'panier',
+    #'panier',
     #'location-field',
     #'polymorphic',  # We need polymorphic installed for the shop
     #'shop',  # The django SHOP application
@@ -121,6 +122,20 @@ AUTH_PASSWORD_VALIDATORS = [
     {'NAME': 'django.contrib.auth.password_validation.CommonPasswordValidator', },
     {'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator', },
 ]
+
+# HAYSTACK_CONNECTIONS = {
+#     'default': {
+#         'ENGINE': 'haystack.backends.elasticsearch2_backend.Elasticsearch2SearchEngine',
+#         'URL': 'http://127.0.0.1:8000/',
+#         'INDEX_NAME': 'haystack',
+#     },
+# }y
+HAYSTACK_CONNECTIONS = {
+    'default': {
+        'ENGINE': 'haystack.backends.whoosh_backend.WhooshEngine',
+        'PATH': os.path.join(os.path.dirname(__file__), 'whoosh_index'),
+    },
+}
 # AUTH_USER_MODEL = 'bourseLibre.models.Producteur'
 # Internationalization
 # https://docs.djangoproject.com/en/1.8/topics/i18n/
@@ -181,7 +196,7 @@ def root(folder):
     return os.path.join(os.path.abspath(os.path.dirname(__file__)), '..', folder)
 
 
-STATIC_ROOT = root('staticstorage')
+# STATIC_ROOT = root('staticstorage')
 STATIC_URL = '/static/'
 # Additional locations of static files
 STATICFILES_DIRS = (

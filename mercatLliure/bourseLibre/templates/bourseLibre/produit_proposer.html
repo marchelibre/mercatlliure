@@ -7,11 +7,10 @@ Quel {{ typeProduit }} proposez-vous ?
 
 {% endblock %}
 {% block content %}
-
 <div class="row-sm-12 row-lg-6 mx-auto "style="display:flex;justify-content:center;align-items:center;">
     <form action="" method="post">
     {% csrf_token %}
-    <table  border="1" >
+    <table  border="0" >
     {{ form.as_table }}
     {% if form2 %}
         {{ form2.as_table }}

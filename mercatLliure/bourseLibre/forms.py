@@ -3,6 +3,7 @@ from django.contrib.auth.forms import UserCreationForm, UserChangeForm, User
 from .models import Produit, Produit_aliment, Produit_objet, Produit_service, Produit_vegetal
 import datetime
 #from datetimewidget.widgets import DateTimeWidget
+from datetimewidget.widgets import DateTimeWidget, DateWidget, TimeWidget
 
 # class yourForm(forms.ModelForm):
 #     class Meta:
@@ -28,8 +29,8 @@ import datetime
 #     even_field = forms.IntegerField(validators=[validate_even])
 
 
-fieldsCommunsProduits = ['souscategorie', 'photo', 'nom_produit', 'description', 'date_debut', 'date_expiration',
-                'etat', 'stock_initial', 'prix', 'unite_prix', 'type_prix', ]
+fieldsCommunsProduits = ['souscategorie', 'photo', 'nom_produit', 'etat',   'description', 'date_debut', 'date_expiration',
+                'unite_prix', 'prix',  'type_prix', 'stock_initial',]
 
 # fieldsCommunsProduits = ['type_prix', 'souscategorie', 'etat']
 #
@@ -42,7 +43,24 @@ class ProduitCreationForm(forms.ModelForm):
         #fields = fieldsCommunsProduits
 
         fields = ['photo', 'nom_produit', 'description', 'date_debut', 'date_expiration',
-                  'stock_initial', 'prix', 'unite_prix',  ]
+                  'stock_initial', 'unite_prix','prix',   ]
+        widgets = {
+            'date_debut': forms.DateInput(attrs={'type':"date"}),
+            'date_expiration': forms.DateInput(attrs={'type':"date"})
+        }
+
+        # widgets = {
+        #     # 'date_debut': DateTimeWidget(attrs={'id':"date_debut"}, usel10n = True, bootstrap_version=4),
+        #     # 'date_expiration': DateWidget(attrs={'id':"date_expiration"}, usel10n = True, bootstrap_version=4),
+        #     'date_debut' : forms.DateInput(attrs={'class' : 'date_picker'}),
+        #     'date_expiration' : forms.DateInput(attrs={'class' : 'date_picker2'})
+        # }
+        # widgets = {
+        #     'text': forms.TextInput(attrs={
+        #         'id': 'post-text',
+        #         'required': True,
+        #         'placeholder': 'Say something...'
+        #     }),
         # model = Produit
         # fields = fieldsCommuns
     # def clean_date_debut(self):
@@ -97,12 +115,20 @@ class Produit_aliment_CreationForm(forms.ModelForm):
         fields =fieldsCommunsProduits
         #exclude = ('proprietes',)
         #fields ='__all__'
+        widgets = {
+            'date_debut': forms.DateInput(attrs={'type':"date"}),
+            'date_expiration': forms.DateInput(attrs={'type':"date"})
+        }
 
 
 class Produit_vegetal_CreationForm(forms.ModelForm):
     class Meta:
         model = Produit_vegetal
         fields =fieldsCommunsProduits
+        widgets = {
+            'date_debut': forms.DateInput(attrs={'type':"date"}),
+            'date_expiration': forms.DateInput(attrs={'type':"date"})
+        }
         #fields ='__all__'
        # exclude = ('proprietes',)
 
@@ -110,6 +136,10 @@ class Produit_service_CreationForm(forms.ModelForm):
     class Meta:
         model = Produit_service
         fields =fieldsCommunsProduits
+        widgets = {
+            'date_debut': forms.DateInput(attrs={'type':"date"}),
+            'date_expiration': forms.DateInput(attrs={'type':"date"})
+        }
         #fields ='__all__'
         #exclude = ('proprietes',)
         #['souscategorie', 'photo', 'nom_produit', 'description', 'date_debut', 'date_expiration',
@@ -120,6 +150,10 @@ class Produit_objet_CreationForm(forms.ModelForm):
     class Meta:
         model = Produit_objet
         fields =fieldsCommunsProduits
+        widgets = {
+            'date_debut': forms.DateInput(attrs={'type':"date"}),
+            'date_expiration': forms.DateInput(attrs={'type':"date"})
+        }
         #fields ='__all__'
         #exclude = ('proprietes',)
 

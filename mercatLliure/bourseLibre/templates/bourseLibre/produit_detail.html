@@ -14,109 +14,133 @@
 [%endcomment%}
 
 {% block content %}
-<style>.soustitre{background-color: {{ produit.couleur }};}</style>
-	<div class="row">
-		<ul class="nav nav-tabs nav-justified">
-			<li>
-				<a href="{% url 'produit_lister' %}">Au marché </a>>&nbsp
-			</li>
-			<li>
-				<a href="/produits/lister/?categorie={{produit.categorie}}" categorie=produit.categorie %}">{{produit.categorie}}</a> >&nbsp
-			</li>
-			<li>
-				producteur : <a href="/produits/lister/?producteur={{produit.user.user.username}}">{{produit.user.user.username}}</a>
-			</li>
-		</ul>
-	</div>
-	<div class="row";>
-		<div class="col-md-8 paddingbase">
-			<div class="row "  style="background-color: {{ produit.couleur }}; min-height:200px !important">
-				<div class="col-md-6 ">
-				{% if produit.photo %}
-				<div class="col-sm-8"> <img alt="{{produit.nom_produit}}" src="{{ produit.photo.url }}" class="img-responsive"/></div>
-				{% else%}
-				<div class="col-sm-8">aucune photo</div>
-				{% endif%}
-					{%comment%}<img alt="Bootstrap Image Preview" src="http://lorempixel.com/140/140/" />{%endcomment%}
-				</div>
-				<div class="col-md-6">
-					<h3>
-						{{produit.nom_produit}}
-					</h3>
-					<p>
-						{{produit.description}}
-					</p>
-					<p>Du {{ produit.date_debut }} au {{ produit.date_expiration }}</p>
-				</div>
+<style>.soustitre{
+	background-color: {{ produit.couleur }};}
+</style>
+
+<script>
+  	function ajouterAuPanier() {
+    	var quantite = parseInt($('#quantite').val());
+     location.href="/panier/ajouter/" + {{produit.id}} + "/" + $('#quantite').val()
+  }
+</script>
+<div class="row">
+	<ul class="nav nav-tabs nav-justified">
+		<li>
+			<a href="{% url 'produit_lister' %}">Au marché </a>>&nbsp
+		</li>
+		<li>
+			<a href="/produits/lister/?categorie={{produit.categorie}}" categorie=produit.categorie %}">{{produit.categorie}}</a> >&nbsp
+		</li>
+		<li>
+			producteur : <a href="/produits/lister/?producteur={{produit.user.user.username}}">{{produit.user.user.username}}</a>
+		</li>
+	</ul>
+</div>
+<div class="row";>
+	<div class="col-md-8 paddingbase detailProduit" style="background-color: {{ produit.couleur }}; min-height:200px !important">
+		<div class="row "  >
+			<div class="col-md-6 ">
+			{% if produit.photo %}
+			<div class="col-sm-8"> <img alt="{{produit.nom_produit}}" src="{{ produit.photo.url }}" class="img-responsive"/></div>
+			{% else%}
+			<div class="col-sm-8">aucune photo</div>
+			{% endif%}
+				{%comment%}<img alt="Bootstrap Image Preview" src="http://lorempixel.com/140/140/" />{%endcomment%}
+			</div>
+			<div class="col-md-6">
+				<h3>
+					{{produit.nom_produit}}
+				</h3>
+				<p>
+					{{produit.description}}
+				</p>
+				<p>Du {{ produit.date_debut }} au {{ produit.date_expiration }}</p>
 			</div>
 		</div>
-		{% if user.id != produit.user.user.id%}
-		<div class="col-md-4 paddingbase">
-
-			<a href="{%url 'produit_ajouterAuPanier' produit.id %}" class="btn btn-primary btn-lg btn-block" type="button">
-				Ajouter au panier</a>
-			<a href="{%url 'produit_contacterProducteur' produit.id %}" class="btn btn-success btn-block  btn-lg" type="button">Contacter le producteur</a>
-		</div>
-		{%else%}
-		<div class="col-md-4 paddingbase">
-
-			<a href="{%url 'produit_modifier' produit.id %}" class="btn btn-warning btn-lg btn-block" type="button">
-				Modifier l'offre</a>
-			<a href="{%url 'produit_supprimer' produit.id %}" class="btn btn-danger btn-lg btn-block" type="button">
-				Supprimer l'offre</a>
-		</div>
-		{%endif%}
 	</div>
-	<div class="row">
-		<div class="col-md-8">
-		<table class="table table-condensed tablecustom">
-			{%comment%}
-			<thead>
-				<tr>
-					<th>
-						#
-					</th>
-					<th>
-
-					</th>
-				</tr>
-			</thead>
-			{%endcomment%}
-			<tbody>
-				<tr class="active">
-					<td>
-						Catégorie :
-					</td>
-					<td>
-						{{ produit.souscategorie }}
-					</td>
-				</tr>
-				<tr class="active">
-					<td>
-						Etat/niveau
-					</td>
-					<td>
-						{{ produit.etat }}
-					</td>
-				</tr>
-				<tr class="active">
-					<td>
-						Prix:
-					</td>
-					<td>
-						{{ produit.prix }} &nbsp {{ produit.unite_prix }}/{{ produit.type_prix }}
-					</td>
-				</tr>
-				<tr class="active">
-					<td>
-						Stock :
-					</td>
-					<td>
-						{{ produit.stock_initial}}
-					</td>
-				</tr>
-			</tbody>
-		</table>
+	{% if user.id != produit.user.user.id%}
+	<div class="col-md-4 paddingbase">
+		<div class=row">
+			Quantité demandée :
+			<div class="input-group">
+				<span class="input-group-btn">
+					<button type="button" class="quantite-left-minus btn btn-danger btn-number"  data-type="minus" data-field="">
+					  <span class="glyphicon glyphicon-minus"></span>
+					</button>
+				</span>
+				<input type="text" id="quantite" name="quantite" class="form-control input-number" value="1" min="0" >
+				<span class="input-group-btn">
+					<button type="button" class="quantite-right-plus btn btn-success btn-number" data-type="plus" data-field="">
+						<span class="glyphicon glyphicon-plus"></span>
+					</button>
+				</span>
+			</div></br>
+		<a onclick="ajouterAuPanier()" class="btn btn-primary btn-lg btn-block " type="button" id="buttonAjouterAuPanier">
+			Ajouter au panier</a></br>
+		<a href="{%url 'produit_contacterProducteur' produit.id %}" class="btn btn-success btn-block  btn-lg" type="button">Contacter le producteur</a>
+		</div>
 	</div>
+	{%else%}
+	<div class="col-md-4 paddingbase">
+
+		<a href="{%url 'produit_modifier' produit.id %}" class="btn btn-warning btn-lg btn-block" type="button">
+			Modifier l'offre</a>
+		<a href="{%url 'produit_supprimer' produit.id %}" class="btn btn-danger btn-lg btn-block" type="button">
+			Supprimer l'offre</a>
+	</div>
+	{%endif%}
+</div>
+<div class="row">
+	<div class="col-md-8">
+	<table class="table table-condensed tablecustom">
+		{%comment%}
+		<thead>
+			<tr>
+				<th>
+					#
+				</th>
+				<th>
+
+				</th>
+			</tr>
+		</thead>
+		{%endcomment%}
+		<tbody>
+			<tr class="active">
+				<td>
+					Catégorie :
+				</td>
+				<td>
+					{{ produit.souscategorie }}
+				</td>
+			</tr>
+			<tr class="active">
+				<td>
+					Etat/niveau
+				</td>
+				<td>
+					{{ produit.etat }}
+				</td>
+			</tr>
+			<tr class="active">
+				<td>
+					Prix:
+				</td>
+				<td>
+					{{ produit.prix }} &nbsp {{ produit.unite_prix }}/{{ produit.type_prix }}
+				</td>
+			</tr>
+			<tr class="active">
+				<td>
+					Stock :
+				</td>
+				<td>
+					{{ produit.stock_initial}}
+				</td>
+			</tr>
+		</tbody>
+	</table>
+</div>
 
 {% endblock %}

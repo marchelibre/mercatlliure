@@ -1,0 +1,16 @@
+{% extends 'base.html' %} 
+{% block title %}Acceuil{% endblock %}
+
+			<div class="jumbotron well">
+{% block subtitle %}Résultats de la recherche (dans les propositions): {{recherche}} ({{produits_list|length}} résultats)
+{% endblock %}
+{% block content %}
+
+<div class="row listOffres">
+    {% for produit in produits_list %}
+        {% include "bourseLibre/produit_template.html" with produit=produit %}
+    {% cycle '' '' '' '<div class="clearfix visible-lg"></div>' %}
+
+    {% endfor %}
+</div>
+{% endblock %}
