@@ -7,7 +7,7 @@ Created on 25 mai 2017
 from django.shortcuts import render, get_object_or_404, HttpResponseRedirect  # render_to_response,
 from .forms import ProduitCreationForm, Produit_aliment_CreationForm, Produit_vegetal_CreationForm, Produit_objet_CreationForm, \
     Produit_service_CreationForm, ProducteurCreationForm, ContactForm
-from .models import Profil, Produit, ChoixProduits, Panier, Item#, ProductFilter#, Produit_aliment, Produit_service, Produit_objet, Produit_vegetal
+from .models import Profil, Produit, ChoixProduits, Panier, Item, get_categorie_from_subcat#, ProductFilter#, Produit_aliment, Produit_service, Produit_objet, Produit_vegetal
 # from django.db.models import Q
 from django.contrib.auth.models import User
 from django.contrib.auth.decorators import login_required
@@ -69,11 +69,13 @@ def proposerProduit(request, typeProduit):
         return HttpResponseRedirect('/produits/detail/' + str(produit.id))
     return render(request, 'bourseLibre/produit_proposer.html', {"form": type_form, "bgcolor": bgcolor, "typeProduit":typeProduit})
 
+# @login_required(login_url='/login/')
 class ProduitModifier(UpdateView):
     model = Produit
     template_name_suffix = '_modifier'
     fields = ['date_debut','date_expiration','nom_produit', 'description', 'prix', 'unite_prix', 'categorie', 'photo', 'estUneOffre',]# 'souscategorie','etat','type_prix']
 
+# @login_required(login_url='/login/')
 class ProduitSupprimer(DeleteView):
     model = Produit
     success_url = reverse_lazy('produit_lister')
@@ -170,10 +172,14 @@ class ListeProduit(ListView):
     def get_queryset(self):
         qs = Produit.objects.select_subclasses()
         params = dict(self.request.GET.items())
-        if "producteurd" in params:
-            qs = qs.filter(user__id=params['producteur'])
+        categorie = None
+        if "producteur" in params:
+            qs = qs.filter(user__user__username=params['producteur'])
         if "categorie" in params:
             qs = qs.filter(categorie=params['categorie'])
+        if "souscategorie" in params:
+            qs = qs.filter(Q(produit_aliment__souscategorie=params['souscategorie']) | Q(produit_vegetal__souscategorie=params['souscategorie']) | Q(produit_service__souscategorie=params['souscategorie'])  | Q(produit_objet__souscategorie=params['souscategorie']))
+
         if "prixmax" in params:
             qs = qs.filter(prix__lt=params['prixmax'])
         if "prixmin" in params:
@@ -190,8 +196,87 @@ class ListeProduit(ListView):
         context = super().get_context_data(**kwargs)
 
         # context['producteur_list'] = Profil.objects.values_list('user__username', flat=True).distinct()
+        context['choixPossibles'] = ChoixProduits.choix
         context['producteur_list'] = Profil.objects.all()
+        context['typeFiltre'] = "aucun"
+        if 'producteur' in self.request.GET:
+            context['typeFiltre'] = "producteur"
+        if 'souscategorie' in self.request.GET:
+            categorie = get_categorie_from_subcat(self.request.GET['souscategorie'])
+            context['categorie_parent'] = categorie
+            context['typeFiltre'] = "souscategorie"
+            context['souscategorie'] = self.request.GET['souscategorie']
+        if 'categorie' in self.request.GET:
+            context['categorie_parent'] = self.request.GET['categorie']
+            context['typeFiltre'] = "categorie"
         return context
+
+def contact(request):
+    form = ContactForm(request.POST or None)
+    if form.is_valid():
+        sujet = form.cleaned_data['sujet']
+        message = form.cleaned_data['message'] + '(par : ' + form.cleaned_data['envoyeur'] + ')'
+        #         envoyeur = form.cleaned_data['envoyeur']
+        mail_admins(sujet, message)
+
+        #         try:
+        #             f.save()
+        #             print("success")
+        #             messages.add_message(request, messages.SUCCESS, 'Feedback sent!')
+        #         except:
+        #             print("failed")
+        #             messages.add_message(request, messages.INFO, 'Unable to send feedback. Try agian')
+
+        #         send_mail( sujet,message, envoyeur, to=['labourselibre@gmail.com'], fail_silently=False,)
+        #         if renvoi:
+        #             mess = "message envoyé a la bourse libre : \\n"
+        #             send_mail( sujet,mess + message, envoyeur, to=[envoyeur], fail_silently=False,)
+
+    return render(request, 'contact.html', {'form': form})
+
+
+
+
+def ajouterAuPanier(request, produit_id, quantite):#, **kwargs):
+    quantite = float(quantite)
+    produit = Produit.objects.get_subclass(pk=produit_id)
+    try:
+        panier = Panier.objects.get(user__id=request.user.id, etat="a")
+    except ObjectDoesNotExist:
+        profil = Profil.objects.get(user__id = request.user.id)
+        panier = Panier(user=profil, )
+        panier.save()
+    panier.add(produit, produit.unite_prix, quantite)
+    return afficher_panier(request)
+
+def enlever_du_panier(request, product_id):
+    product = Produit.objects.get_subclass(pk=produit_id)
+    panier = Panier.objects.get(user=request.user, etat="a")
+    panier.remove(product)
+    return render(request, 'panier.html', {panier:panier})
+
+
+def afficher_panier(request):
+    try:
+        panier = Panier.objects.get(user__id=request.user.id, etat="a")
+    except ObjectDoesNotExist:
+        profil = Profil.objects.get(user__id = request.user.id)
+        panier = Panier(user=profil, )
+        panier.save()
+    items = Item.objects.filter(panier__id=panier.id)
+
+    return render(request, 'panier.html', {'panier':panier, 'items':items})
+
+def chercher(request):
+    recherche = request.GET.get('id_recherche')
+    if recherche:
+        produits_list = Produit.objects.filter(Q(description__contains=recherche) | Q(nom_produit__contains=recherche), ).select_subclasses()
+    else:
+        produits_list = []
+    return render(request, 'chercher.html', {'recherche':recherche, 'produits_list':produits_list})
+
+
+
 
 # from django_filters import rest_framework as filters
 # from rest_framework import generics
@@ -295,67 +380,3 @@ class ListeProduit(ListView):
 #         context['typeFiltre'] = "producteur"
 #         context['filtre'] = context['user.username']
 #         return context
-
-def contact(request):
-    form = ContactForm(request.POST or None)
-    if form.is_valid():
-        sujet = form.cleaned_data['sujet']
-        message = form.cleaned_data['message'] + '(par : ' + form.cleaned_data['envoyeur'] + ')'
-        #         envoyeur = form.cleaned_data['envoyeur']
-        mail_admins(sujet, message)
-
-        #         try:
-        #             f.save()
-        #             print("success")
-        #             messages.add_message(request, messages.SUCCESS, 'Feedback sent!')
-        #         except:
-        #             print("failed")
-        #             messages.add_message(request, messages.INFO, 'Unable to send feedback. Try agian')
-
-        #         send_mail( sujet,message, envoyeur, to=['labourselibre@gmail.com'], fail_silently=False,)
-        #         if renvoi:
-        #             mess = "message envoyé a la bourse libre : \\n"
-        #             send_mail( sujet,mess + message, envoyeur, to=[envoyeur], fail_silently=False,)
-
-    return render(request, 'contact.html', {'form': form})
-
-
-
-
-def ajouterAuPanier(request, produit_id, quantite):#, **kwargs):
-    quantite = float(quantite)
-    produit = Produit.objects.get_subclass(pk=produit_id)
-    try:
-        panier = Panier.objects.get(user__id=request.user.id, etat="a")
-    except ObjectDoesNotExist:
-        profil = Profil.objects.get(user__id = request.user.id)
-        panier = Panier(user=profil, )
-        panier.save()
-    panier.add(produit, produit.unite_prix, quantite)
-    return afficher_panier(request)
-
-def enlever_du_panier(request, product_id):
-    product = Produit.objects.get_subclass(pk=produit_id)
-    panier = Panier.objects.get(user=request.user, etat="a")
-    panier.remove(product)
-    return render(request, 'panier.html', {panier:panier})
-
-
-def afficher_panier(request):
-    try:
-        panier = Panier.objects.get(user__id=request.user.id, etat="a")
-    except ObjectDoesNotExist:
-        profil = Profil.objects.get(user__id = request.user.id)
-        panier = Panier(user=profil, )
-        panier.save()
-    items = Item.objects.filter(panier__id=panier.id)
-
-    return render(request, 'panier.html', {'panier':panier, 'items':items})
-
-def chercher(request):
-    recherche = request.GET.get('id_recherche')
-    if recherche:
-        produits_list = Produit.objects.filter(Q(description__contains=recherche) | Q(nom_produit__contains=recherche), ).select_subclasses()
-    else:
-        produits_list = []
-    return render(request, 'chercher.html', {'recherche':recherche, 'produits_list':produits_list})

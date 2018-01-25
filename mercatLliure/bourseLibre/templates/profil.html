@@ -19,6 +19,18 @@ Profil de {{ user.username }}
   <li>inscrit_newsletter: {{ user.profil.inscrit_newsletter }}</li>
   <li>date adhésion: {{ user.profil.date_registration }}</li>
 </ul>
+<script src="https://maps.googleapis.com/maps/api/js?callback=myMap"></script>
+<script>
+function myMap() {
+    var mapOptions = {
+        center: new google.maps.LatLng(51.5, -0.12),
+        zoom: 10,
+        mapTypeId: google.maps.MapTypeId.HYBRID
+    }
+var map = new google.maps.Map(document.getElementById("map"), mapOptions);
+}
+</script>
+<div id="map" style="width:400px;height:400px;"></div>
 {% endblock %}
 
     

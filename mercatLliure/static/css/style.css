@@ -3,8 +3,9 @@ body {
     #9999ff url("../images/background.png");%url("../images/background.png");*/
     background: #E9E9E9;
     margin: auto;
-    width: 90%;
-    padding: 10px;
+    width: 97%;
+    /*padding: 10px;*/
+    padding-top: 80px;
     /*font-family: cursive;*/
     font-family: serif;
     /*font-family: system-ui;*/
@@ -30,11 +31,17 @@ ul.errorlist > li {
     margin-left: 15px;
     padding: 5px;
 }
-/*.breadcrumb span, .breadcrumb div {display:inline-block!important; float:left!important}*/
+/*
+.breadcrumb span, .breadcrumb div {display:inline-block!important; float:right!important}*/
+.breadcrumbs{
+    text-align:center;
+}
 .navbar {
     border-radius: 0.4em;
-    border: 3px solid #053200;
-    %margin-bottom: 2em
+    border: 2px solid #053200;
+    box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+    background-color:grey;
+
 }
 
 .navbar-brand {
@@ -42,10 +49,9 @@ ul.errorlist > li {
 }
 
 .contenu{
-    margin-top: 5em;
+    /*margin-top: 2em;*/
     margin-bottom: 2em;
     border-radius: 0.4em;
-
     padding: 10px 10px 10px 10px;
 }
 /*
@@ -71,13 +77,15 @@ ul.errorlist > li {
 .bodycontenu{
     padding-bottom: 2em;
     border-radius: 0.4em;
-    /*border: 1px solid #053200;*/
+    /*border: 0.5px solid #053200;*/
     padding: 10px ;
 }
 .bodycontenucomplet{
     padding: 10px ;
     border-radius: 0.4em;
     box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+    min-height: 500px;
+    border: 0.5px solid #053200;
     }
 
 #parent {

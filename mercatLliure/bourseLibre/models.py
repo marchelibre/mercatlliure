@@ -16,21 +16,41 @@ from django.urls import reverse
 from django.utils.translation import ugettext_lazy as _
 #from django.contrib.contenttypes.models import ContentType
 import decimal
-# from datetimewidget.widgets import DateTimeWidget
 
-# class Panier(models.Model):
-#     listeProduits = []
-#     date_creation = models.DateTimeField(verbose_name="Date de création", editable=False)
-#     etat = "attente"
-#
-#     def save(self, *args, **kwargs):
-#         ''' On save, update timestamps '''
-#         if not self.id:
-#             self.date_creation = timezone.now()
-#         return super(Panier, self).save(*args, **kwargs)
-#
-#     def add_produit(self, produit):
-#         self.listeProduits.append(produit)
+
+class ChoixProduits():
+    #couleurs = {'aliment':'#D8C457','vegetal':'#4CAF47','service':'#BE373A','objet':'#5B4694'}
+    couleurs = {'aliment':'#D8AD57','vegetal':'#A9CB52','service':'#E66562','objet':'#80B2C0'}
+    typePrixUnite =  (('kg', 'kg'), ('100g', '100g'), ('10g', '10g'),('g', 'g'),  ('un', 'unité'), ('li', 'litre'))
+
+    choix = {
+    'aliment': {
+        'souscategorie': ('légumes', 'fruits', 'champignons', 'boisson', 'herbes','condiments', 'viande','poisson','boulangerie','patisserie', 'autre'),
+        'etat': (('fr', 'frais'), ('se', 'sec'), ('cs', 'conserve')),
+        'type_prix': typePrixUnite,
+    },
+    'vegetal': {
+        'souscategorie': ('graines', 'fleurs', 'plantes','autre'),
+        'etat': (('frais', 'frais'), ('séché', 'séché')),
+        'type_prix': typePrixUnite,
+    },
+    'service': {
+        'souscategorie': ('jardinier', 'informaticien', 'electricen', 'plombier', 'mécanicien', 'autre'),
+        'etat': (('excellent', 'excellent'), ('bon', 'bon'), ('moyen', 'moyen'), ('nul', 'nul')),
+        'type_prix': (('h', 'heure'), ('un', 'unité')),
+    },
+    'objet': {
+        'souscategorie': ('materiel','vehicule', 'multimedia', 'mobilier','autre'),
+        'etat': (('excellent', 'excellent'), ('bon', 'bon'), ('moyen', 'moyen'), ('mauvais', 'mauvais')),
+        'type_prix': typePrixUnite,
+    }
+    }
+
+def get_categorie_from_subcat(subcat):
+    for typeProduit, dico in ChoixProduits.choix.items():
+        if subcat in dico['souscategorie']:
+            return typeProduit
+    return "Categorie inconnue (souscategorie : " + str(subcat) +")"
 
 
 
@@ -75,38 +95,6 @@ def save_user_profile(sender, instance, **kwargs):
 
 
 
-class ChoixProduits():
-    #couleurs = {'aliment':'#D8C457','vegetal':'#4CAF47','service':'#BE373A','objet':'#5B4694'}
-    couleurs = {'aliment':'#D8AD57','vegetal':'#A9CB52','service':'#E66562','objet':'#80B2C0'}
-    typePrixUnite =  (('kg', 'kg'), ('100g', '100g'), ('10g', '10g'),('g', 'g'),  ('un', 'unité'), ('li', 'litre'))
-    choix = {
-    'aliment': {
-        'souscategorie': (('légumes', 'légumes'), ('fruits', 'fruits'), ('boisson', 'boisson'), ('herbes', 'herbes'),
-                          ('condiments', 'condiments'), ('viande', 'viande'), ('poisson', 'poisson'),
-                          ('boulangerie', 'boulangerie'), ('patisserie', 'patisserie'), ('autre', 'autre')),
-        'etat': (('fr', 'frais'), ('se', 'sec'), ('cs', 'conserve')),
-        'type_prix': typePrixUnite,
-    },
-    'vegetal': {
-        'souscategorie': (('graines', 'graines'), ('fleurs', 'fleurs'), ('plantes', 'plantes')),
-        'etat': (('frais', 'frais'), ('séché', 'séché')),
-        'type_prix': typePrixUnite,
-    },
-    'service': {
-        'souscategorie': (('jardinier', 'jardinier'), ('informaticien', 'informaticien'), ('electricen', 'electricien'),
-                          ('plombier', 'plombier'), ('mécanicien', 'mécanicien'), ('autre', 'autre')),
-        'etat': (('excellent', 'excellent'), ('bon', 'bon'), ('moyen', 'moyen'), ('nul', 'nul')),
-        'type_prix': (('h', 'heure'), ('un', 'unité')),
-    },
-    'objet': {
-        'souscategorie': (
-        ('materiel', 'materiel'), ('vehicule', 'vehicule'), ('multimedia', 'multimedia'), ('mobilier', 'mobilier'),
-        ('autre', 'autre'),),
-        'etat': (('excellent', 'excellent'), ('bon', 'bon'), ('moyen', 'moyen'), ('mauvais', 'mauvais')),
-        'type_prix': typePrixUnite,
-    }
-}
-
 #from polymorphic.models import PolymorphicModel
 from django.template.defaultfilters import slugify
 # from shop.models import BaseProduct
@@ -134,6 +122,7 @@ class Produit(models.Model):  # , BaseProduct):
                                  choices=CHOIX_CATEGORIE,
                                  default='aliment')
     photo = models.ImageField(blank=True, upload_to="imagesProduits/")
+
 
     estUneOffre = models.BooleanField(default=True)
 
@@ -169,6 +158,13 @@ class Produit(models.Model):  # , BaseProduct):
     def get_type_prix(self):
         return Produit.objects.get_subclass(id=self.id).type_prix
 
+    def get_unite_prix(self):
+        if self.unite_prix == "don":
+            return self.unite_prix
+        else:
+            return Produit.objects.get_subclass(id=self.id).get_unite_prix()
+            # return prod.get_unite_prix()
+
     def get_prix(self):
         if self.unite_prix == "don":
             return 0
@@ -178,6 +174,160 @@ class Produit(models.Model):  # , BaseProduct):
     def get_nom_class(self):
         return "Produit"
 
+    def get_souscategorie(self):
+        return"standard"
+
+
+
+class Produit_aliment(Produit):  # , BaseProduct):
+    type = 'aliment'
+    couleur = models.CharField(
+        max_length=20,
+        choices=((ChoixProduits.couleurs['aliment'],ChoixProduits.couleurs['aliment']),),
+        default=ChoixProduits.couleurs['aliment']
+    )
+    souscategorie = models.CharField(
+        max_length=20,
+        choices=((cat,cat) for cat in ChoixProduits.choix[type]['souscategorie']),
+        default=ChoixProduits.choix[type]['souscategorie'][0][0]
+    )
+    etat = models.CharField(
+        max_length=20,
+        choices=ChoixProduits.choix[type]['etat'],
+        default=ChoixProduits.choix[type]['etat'][0][0]
+    )
+    type_prix = models.CharField(
+        max_length=20,
+        choices=ChoixProduits.choix[type]['type_prix'],
+        default=ChoixProduits.choix[type]['type_prix'][0][0], verbose_name="par"
+    )
+    def get_unite_prix(self):
+        if self.unite_prix == "don":
+            return self.unite_prix
+        else:
+            return self.unite_prix + "/" + self.type_prix
+
+    def get_prixEtUnite(self):
+        if self.unite_prix == "don":
+            return 'gratuit'
+        return str(self.get_prix()) + " " + self.get_unite_prix()
+
+    def get_souscategorie(self):
+        return"aliment"
+
+class Produit_vegetal(Produit):  # , BaseProduct):
+    type = 'vegetal'
+    couleur = models.CharField(
+        max_length=20,
+        choices=((ChoixProduits.couleurs['vegetal'],ChoixProduits.couleurs['vegetal']),),
+        default=ChoixProduits.couleurs['vegetal']
+    )
+    souscategorie = models.CharField(
+        max_length=20,
+        choices=((cat,cat) for cat in ChoixProduits.choix[type]['souscategorie']),
+        default=ChoixProduits.choix[type]['souscategorie'][0][0]
+    )
+    etat = models.CharField(
+        max_length=20,
+        choices=ChoixProduits.choix[type]['etat'],
+        default=ChoixProduits.choix[type]['etat'][0][0]
+    )
+    type_prix = models.CharField(
+        max_length=20,
+        choices=ChoixProduits.choix[type]['type_prix'],
+        default=ChoixProduits.choix[type]['type_prix'][0][0], verbose_name="par"
+    )
+    def get_unite_prix(self):
+        if self.unite_prix == "don":
+            return self.unite_prix
+        else:
+            return self.unite_prix + "/" + self.type_prix
+
+    def get_prixEtUnite(self):
+        if self.unite_prix == "don":
+            return 'gratuit'
+        return str(self.get_prix()) + " " + self.get_unite_prix()
+
+    def get_souscategorie(self):
+        return"vegetal"
+
+class Produit_service(Produit):  # , BaseProduct):
+    type = 'service'
+    couleur = models.CharField(
+        max_length=20,
+        choices=((ChoixProduits.couleurs['service'],ChoixProduits.couleurs['service']),),
+        default=ChoixProduits.couleurs['service']
+    )
+    souscategorie = models.CharField(
+        max_length=20,
+        choices=((cat,cat) for cat in ChoixProduits.choix[type]['souscategorie']),
+        default=ChoixProduits.choix["service"]['souscategorie'][0][0]
+    )
+    etat = models.CharField(
+        max_length=20,
+        choices=ChoixProduits.choix["service"]['etat'],
+        default=ChoixProduits.choix["service"]['etat'][0][0]
+    )
+    type_prix = models.CharField(
+        max_length=20,
+        choices=ChoixProduits.choix["service"]['type_prix'],
+        default=ChoixProduits.choix["service"]['type_prix'][0][0], verbose_name="par"
+    )
+    def get_unite_prix(self):
+        if self.unite_prix == "don":
+            return self.unite_prix
+        else:
+            return self.unite_prix + "/" + self.type_prix
+
+    def get_prixEtUnite(self):
+        if self.unite_prix == "don":
+            return 'gratuit'
+        return str(self.get_prix()) + " " + self.get_unite_prix()
+
+    def get_souscategorie(self):
+        return "service"
+
+class Produit_objet(Produit):  # , BaseProduct):
+    type = 'objet'
+    couleur = models.CharField(
+        max_length=20,
+        choices=((ChoixProduits.couleurs['objet'],ChoixProduits.couleurs['objet']),),
+        default=ChoixProduits.couleurs['objet']
+    )
+    souscategorie = models.CharField(
+        max_length=20,
+        choices=((cat,cat) for cat in ChoixProduits.choix[type]['souscategorie']),
+        default=ChoixProduits.choix[type]['souscategorie'][0][0]
+    )
+    etat = models.CharField(
+        max_length=20,
+        choices=ChoixProduits.choix[type]['etat'],
+        default=ChoixProduits.choix[type]['etat'][0][0]
+    )
+    type_prix = models.CharField(
+        max_length=20,
+        choices=ChoixProduits.choix[type]['type_prix'],
+        default=ChoixProduits.choix[type]['type_prix'][0][0], verbose_name="par"
+    )
+    def get_unite_prix(self):
+        if self.unite_prix == "don":
+            return self.unite_prix
+        else:
+            return self.unite_prix + "/" + self.type_prix
+
+    def get_prixEtUnite(self):
+        if self.unite_prix == "don":
+            return 'gratuit'
+        return str(self.get_prix()) + " " + self.get_unite_prix()
+
+    def get_souscategorie(self):
+        return "objet"
+
+class ItemAlreadyExists(Exception):
+    pass
+
+class ItemDoesNotExist(Exception):
+    pass
 
 # from rest_framework import serializers
 # class ProduitSerializer(serializers.ModelSerializer):
@@ -217,130 +367,6 @@ class ProductFilter(django_filters.FilterSet):
         exclude=('photo',)
 
 
-
-
-
-class Produit_aliment(Produit):  # , BaseProduct):
-    type = 'aliment'
-    couleur = models.CharField(
-        max_length=20,
-        choices=((ChoixProduits.couleurs['aliment'],ChoixProduits.couleurs['aliment']),),
-        default=ChoixProduits.couleurs['aliment']
-    )
-    souscategorie = models.CharField(
-        max_length=20,
-        choices=ChoixProduits.choix[type]['souscategorie'],
-        default=ChoixProduits.choix[type]['souscategorie'][0][0]
-    )
-    etat = models.CharField(
-        max_length=20,
-        choices=ChoixProduits.choix[type]['etat'],
-        default=ChoixProduits.choix[type]['etat'][0][0]
-    )
-    type_prix = models.CharField(
-        max_length=20,
-        choices=ChoixProduits.choix[type]['type_prix'],
-        default=ChoixProduits.choix[type]['type_prix'][0][0], verbose_name="par"
-    )
-    def get_unite_prix(self):
-        if self.unite_prix == "don":
-            return self.unite_prix
-        else:
-            return self.unite_prix + "/" + self.type_prix
-
-
-class Produit_vegetal(Produit):  # , BaseProduct):
-    type = 'vegetal'
-    couleur = models.CharField(
-        max_length=20,
-        choices=((ChoixProduits.couleurs['vegetal'],ChoixProduits.couleurs['vegetal']),),
-        default=ChoixProduits.couleurs['vegetal']
-    )
-    souscategorie = models.CharField(
-        max_length=20,
-        choices=ChoixProduits.choix[type]['souscategorie'],
-        default=ChoixProduits.choix[type]['souscategorie'][0][0]
-    )
-    etat = models.CharField(
-        max_length=20,
-        choices=ChoixProduits.choix[type]['etat'],
-        default=ChoixProduits.choix[type]['etat'][0][0]
-    )
-    type_prix = models.CharField(
-        max_length=20,
-        choices=ChoixProduits.choix[type]['type_prix'],
-        default=ChoixProduits.choix[type]['type_prix'][0][0], verbose_name="par"
-    )
-    def get_unite_prix(self):
-        if self.unite_prix == "don":
-            return self.unite_prix
-        else:
-            return self.unite_prix + "/" + self.type_prix
-
-
-class Produit_service(Produit):  # , BaseProduct):
-    type = 'service'
-    couleur = models.CharField(
-        max_length=20,
-        choices=((ChoixProduits.couleurs['service'],ChoixProduits.couleurs['service']),),
-        default=ChoixProduits.couleurs['service']
-    )
-    souscategorie = models.CharField(
-        max_length=20,
-        choices=ChoixProduits.choix["service"]['souscategorie'],
-        default=ChoixProduits.choix["service"]['souscategorie'][0][0]
-    )
-    etat = models.CharField(
-        max_length=20,
-        choices=ChoixProduits.choix["service"]['etat'],
-        default=ChoixProduits.choix["service"]['etat'][0][0]
-    )
-    type_prix = models.CharField(
-        max_length=20,
-        choices=ChoixProduits.choix["service"]['type_prix'],
-        default=ChoixProduits.choix["service"]['type_prix'][0][0], verbose_name="par"
-    )
-    def get_unite_prix(self):
-        if self.unite_prix == "don":
-            return self.unite_prix
-        else:
-            return self.unite_prix + "/" + self.type_prix
-
-
-class Produit_objet(Produit):  # , BaseProduct):
-    type = 'objet'
-    couleur = models.CharField(
-        max_length=20,
-        choices=((ChoixProduits.couleurs['objet'],ChoixProduits.couleurs['objet']),),
-        default=ChoixProduits.couleurs['objet']
-    )
-    souscategorie = models.CharField(
-        max_length=20,
-        choices=ChoixProduits.choix[type]['souscategorie'],
-        default=ChoixProduits.choix[type]['souscategorie'][0][0]
-    )
-    etat = models.CharField(
-        max_length=20,
-        choices=ChoixProduits.choix[type]['etat'],
-        default=ChoixProduits.choix[type]['etat'][0][0]
-    )
-    type_prix = models.CharField(
-        max_length=20,
-        choices=ChoixProduits.choix[type]['type_prix'],
-        default=ChoixProduits.choix[type]['type_prix'][0][0], verbose_name="par"
-    )
-    def get_unite_prix(self):
-        if self.unite_prix == "don":
-            return self.unite_prix
-        else:
-            return self.unite_prix + "/" + self.type_prix
-
-
-class ItemAlreadyExists(Exception):
-    pass
-
-class ItemDoesNotExist(Exception):
-    pass
 
 
 class Panier(models.Model):

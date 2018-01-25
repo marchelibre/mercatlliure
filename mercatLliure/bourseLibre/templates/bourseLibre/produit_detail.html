@@ -4,12 +4,14 @@
 [%comment%}
 <style>.body{background: {{ produit.couleur }};}</style>
 {% block subtitle %}
+<div class="textcenter">
 <a class="infos">Offre proposée par </a>
 {%if produit.user.id|is_numeric%}
 <a class="infos" href="{% url 'profil' produit.user.id %}">{{produit.user.user.username}}</a><a class="infos">, le {{ produit.date_creation }}</a>
 {%else%}
 <a class="infos" href="{% url 'profilInconnu' %}">un producteur disparu !</a><a class="infos">, le {{ produit.date_creation }}</a>
 {% endif %}
+	</div>
 {% endblock %}
 [%endcomment%}
 
@@ -24,18 +26,14 @@
      location.href="/panier/ajouter/" + {{produit.id}} + "/" + $('#quantite').val()
   }
 </script>
-<div class="row">
-	<ul class="nav nav-tabs nav-justified">
-		<li>
-			<a href="{% url 'produit_lister' %}">Au marché </a>>&nbsp
-		</li>
-		<li>
-			<a href="/produits/lister/?categorie={{produit.categorie}}" categorie=produit.categorie %}">{{produit.categorie}}</a> >&nbsp
-		</li>
-		<li>
-			producteur : <a href="/produits/lister/?producteur={{produit.user.user.username}}">{{produit.user.user.username}}</a>
-		</li>
-	</ul>
+<div class="d-flex justify-content-center">
+	<nav class="breadcrumb">
+	  <a class="breadcrumb-item" href="{% url 'produit_lister' %}">Au marché</a>
+	  <a class="breadcrumb-item" href="/produits/lister/?categorie={{produit.categorie}}" categorie=produit.categorie %}">{{produit.categorie}}</a>
+	  <a class="breadcrumb-item" href="/produits/lister/?souscategorie={{produit.souscategorie}}" souscategorie=produit.souscategorie %}">{{produit.souscategorie}}</a>
+	  <a class="breadcrumb-item" href="/produits/lister/?producteur={{produit.user.user.username}}">{{produit.user.user.username}}</a>
+	  <span class="breadcrumb-item active">{{produit.nom_produit}}</span>
+	</nav>
 </div>
 <div class="row";>
 	<div class="col-md-8 paddingbase detailProduit" style="background-color: {{ produit.couleur }}; min-height:200px !important">
@@ -128,7 +126,7 @@
 					Prix:
 				</td>
 				<td>
-					{{ produit.prix }} &nbsp {{ produit.unite_prix }}/{{ produit.type_prix }}
+					{{ produit.get_prixEtUnite }}
 				</td>
 			</tr>
 			<tr class="active">
