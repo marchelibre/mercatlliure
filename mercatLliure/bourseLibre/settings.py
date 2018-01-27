@@ -42,16 +42,22 @@ INSTALLED_APPS = (
     'django.contrib.staticfiles',
     'django.contrib.admindocs',
     'django.contrib.sites',
+    #'django.contrib.gis',
     'bootstrap','fontawesome',
     'haystack',
     'debug_toolbar',
     'model_utils',
-    'address',
+    #'address',
     'bourseLibre',
     'blog',
     'django_extensions',
     'django_filters',
     'rest_framework',
+    'leaflet'
+    #"geoposition",
+    #"geodjango",
+    #'osm_field',
+    #'location_field.apps.DefaultConfig',
     #'sitetree',
     #'panier',
     #'location-field',
@@ -84,6 +90,8 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
    'debug_toolbar.middleware.DebugToolbarMiddleware',
 ]
+
+
 ROOT_URLCONF = 'bourseLibre.urls'
 
 TEMPLATES = [
@@ -117,11 +125,12 @@ DATABASES = {
 }
 
 AUTH_PASSWORD_VALIDATORS = [
-    {'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator', },
+    #{'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator', },
     # {    'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator',},
-    {'NAME': 'django.contrib.auth.password_validation.CommonPasswordValidator', },
-    {'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator', },
+    #{'NAME': 'django.contrib.auth.password_validation.CommonPasswordValidator', },
+    #{'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator', },
 ]
+#AUTH_USER_MODEL = 'bourseLibre.Profil'
 
 # HAYSTACK_CONNECTIONS = {
 #     'default': {
@@ -202,3 +211,20 @@ STATIC_URL = '/static/'
 STATICFILES_DIRS = (
     root('static'),
 )
+
+# LOCATION_FIELD = {
+#     'map.provider': 'openstreetmap',
+# }
+
+#GEOPOSITION_GOOGLE_MAPS_API_KEY = ' AIzaSyCmGcPj0ti_7aEagETrbJyHPbE3U6gVfSA '
+
+#GOOGLE_API_KEY = 'AIzaSyCmGcPj0ti_7aEagETrbJyHPbE3U6gVfSA'
+
+#GOOGLE_API_KEY = 'AIzaSyC10StWuCZHLPmSZCyfNEdmgZ7CTqdngy0'
+
+LEAFLET_CONFIG = {
+'DEFAULT_CENTER': (42.7201813, 2.8876436),
+'DEFAULT_ZOOM': 10,
+'MIN_ZOOM': 3,
+'MAX_ZOOM': 18,
+}

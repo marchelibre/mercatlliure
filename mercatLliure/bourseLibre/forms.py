@@ -1,9 +1,11 @@
 from django import forms
 from django.contrib.auth.forms import UserCreationForm, UserChangeForm, User
-from .models import Produit, Produit_aliment, Produit_objet, Produit_service, Produit_vegetal
-import datetime
+from .models import Produit, Produit_aliment, Produit_objet, Produit_service, Produit_vegetal, Adresse, Profil
+
+#import datetime
 #from datetimewidget.widgets import DateTimeWidget
-from datetimewidget.widgets import DateTimeWidget, DateWidget, TimeWidget
+#from datetimewidget.widgets import DateTimeWidget, DateWidget, TimeWidget
+#from address.forms import AddressField
 
 # class yourForm(forms.ModelForm):
 #     class Meta:
@@ -158,31 +160,116 @@ class Produit_objet_CreationForm(forms.ModelForm):
         #exclude = ('proprietes',)
 
 # widgets = { 'date_debut': forms.DateTimeInput(attrs={'class': 'datetime-input'})}
+class AdresseForm(forms.ModelForm):
+    rue = forms.CharField(label="Adresse", required=False)
+    code_postal = forms.CharField(label="Code postal*", initial="66000")
+    latitude = forms.FloatField(label="Latitude", initial="42", required=False)
+    longitude = forms.FloatField(label="Longitude", initial="2", required=False)
+    pays = forms.CharField(label="Pays", initial="France",required=False)
+    telephone = forms.FloatField(label="Téléphone", required=False)
+
+    class Meta:
+        model = Adresse
+        fields = '__all__'
+        exclude = ('latitude', 'longitude')
+    # def save(self, *args, **kwargs):
+    #     import requests
+    #
+    #     address = self.cleaned_data['rue'] + ", "+ self.cleaned_data['code_postal']
+    #     api_key = "AIzaSyCmGcPj0ti_7aEagETrbJyHPbE3U6gVfSA"
+    #     api_response = requests.get(
+    #         'https://maps.googleapis.com/maps/api/geocode/json?address={0}&key={1}'.format(address, api_key))
+    #     api_response_dict = api_response.json()
+    #
+    #     if api_response_dict['status'] == 'OK':
+    #         self.latitude = api_response_dict['results'][0]['geometry']['location']['lat']
+    #         self.longitude = api_response_dict['results'][0]['geometry']['location']['lng']
+    #     return super(AdresseForm, self).save(*args, **kwargs)
+
+class ProfilCreationForm(forms.ModelForm):
+    class Meta:
+        model = Profil
+        exclude = ['user', 'adresse']
+
+    # def save(self, user, adresse):
+    #     profil = super(ProfilCreationForm, self).save(commit=False)
+    #     profil.user = user
+    #     profil.adresse = adresse
+    #     profil.save()
+    #     return profil
+
 
 class ProducteurCreationForm(UserCreationForm):
-    email = forms.EmailField(label="Email")
-    username = forms.CharField(label="Username")
-    description = forms.CharField(widget=forms.Textarea(attrs={'cols': 80, 'rows': 10}))
-    competences = forms.CharField(label="competences", widget=forms.Textarea(attrs={'cols': 80, 'rows': 10}))
-    avatar = forms.ImageField(required=False)
-    inscrit_newsletter = forms.BooleanField(required=False)
+    email = forms.EmailField(label="Email", required=False)
+    username = forms.CharField(label="pseudonyme")
 
     class Meta:
         model = User
-        fields = ['username', 'email', 'password1', 'password2', 'description', 'competences', 'inscrit_newsletter']
+        fields = ['username', 'email', 'password1', 'password2',
+                #  'competences', 'rue', 'code_postal', 'latitude', 'longitude', 'pays', 'telephone'
+                  ]
     #
 
-    def save(self, commit=True):
+    def save(self, commit=True, is_active = False):
         user = super(ProducteurCreationForm, self).save(commit=False)
         user.email = self.cleaned_data['email']
-        user.username = self.cleaned_data['username']
-        user.description = self.cleaned_data['description']
-        user.password = self.cleaned_data['password1']
+        user.username =self.cleaned_data['username']
+        user.set_password(self.cleaned_data['password1'])
+        user.is_active = is_active
+        user.is_superuser = False
 
         if commit:
             user.save()
-
         return user
+
+    # def save(self,):
+    #     user = super(UserCreationForm, self).save(commit=False)
+    #     user.email= self.cleaned_data['email']
+    #     user.username=self.cleaned_data['username']
+    #     user.password= self.cleaned_data['password1']
+    #     user.is_active=False
+    #     user.is_superuser=False
+    #
+    #     adresse =  Adresse.objects.create(
+    #         rue=self.cleaned_data['rue'],
+    #         code_postal=self.cleaned_data['code_postal'],
+    #         latitude=self.cleaned_data['latitude'],
+    #         longitude=self.cleaned_data['longitude'],
+    #         pays=self.cleaned_data['pays'],
+    #         telephone=self.cleaned_data['telephone'])
+    #
+    #     user.save()
+    #     adresse.save()
+    #     profil = Profil.objects.create(adresse=adresse,
+    #                                    description=self.cleaned_data['description'],
+    #                                    competences=self.cleaned_data['competences'])
+    #
+    #     #profil= super(ProfilCreationForm, self).save(commit=False)
+    #     profil.user=user
+    #     profil.adresse=adresse
+    #     profil.description=self.cleaned_data['description']
+    #     profil.competences=self.cleaned_data['competences']
+    #     # profil = Profil.objects.create(user=user,
+    #     #                                adresse=adresse,
+    #     #                                description=self.cleaned_data['description'],
+    #     #                                competences=self.cleaned_data['competences'])
+    #
+    #     profil.save()
+    #
+    #     return profil
+
+
+    # def save(self, commit=True):
+    #     user = super(ProducteurCreationForm, self).save(commit=False)
+    #     user.email = self.cleaned_data['email']
+    #     user.username = self.cleaned_data['username']
+    #     user.description = self.cleaned_data['description']
+    #     user.password = self.cleaned_data['password1']
+    #
+    #     if commit:
+    #         user.save()
+    #
+    #     return user
 
 
 class ProducteurChangeForm(UserChangeForm):
@@ -224,3 +311,13 @@ class ContactForm(forms.Form):
     # class ConnexionForm(forms.Form):
     #     username = forms.CharField(label="Nom d'utilisateur", max_length=30)
     #     password = forms.CharField(label="Mot de passe", widget=forms.PasswordInput)
+
+#
+# from .models import Place
+#
+#
+# class LocationForm(forms.ModelForm):
+#     class Meta:
+#         model = Place
+#         exclude = ()
+

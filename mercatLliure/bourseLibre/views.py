@@ -6,10 +6,11 @@ Created on 25 mai 2017
 '''
 from django.shortcuts import render, get_object_or_404, HttpResponseRedirect  # render_to_response,
 from .forms import ProduitCreationForm, Produit_aliment_CreationForm, Produit_vegetal_CreationForm, Produit_objet_CreationForm, \
-    Produit_service_CreationForm, ProducteurCreationForm, ContactForm
+    Produit_service_CreationForm, ProducteurCreationForm, ContactForm, AdresseForm, ProfilCreationForm
 from .models import Profil, Produit, ChoixProduits, Panier, Item, get_categorie_from_subcat#, ProductFilter#, Produit_aliment, Produit_service, Produit_objet, Produit_vegetal
 # from django.db.models import Q
 from django.contrib.auth.models import User
+from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.decorators import login_required
 from django.views.generic import ListView, UpdateView, DeleteView
 from django.urls import reverse_lazy
@@ -119,6 +120,9 @@ def merci(request, template_name='merci.html'):
 
 def profilcourant(request, ):
     user = get_object_or_404(User, id=request.user.id)
+
+
+
     return render(request, 'profil.html', {'user': user})
 
 
@@ -145,23 +149,20 @@ def profilInconnu(request):
 
 
 def register(request):
-    form = ProducteurCreationForm(request.POST or None)
-    if form.is_valid():
-        user = form.save(commit=False)
-        user.is_active = False
-        user = form.save(commit=True)
+    form_adresse = AdresseForm(request.POST or None)
+    #form_user = UserCreationForm(request.POST or None)
+    form_user = ProducteurCreationForm(request.POST or None)
+    form_profil = ProfilCreationForm(request.POST or None)
+    if form_adresse.is_valid() and form_user.is_valid() and form_profil.is_valid():
+        adresse = form_adresse.save()
+        user = form_user.save(commit=True,is_active = False)
+        profil = form_profil.save(commit=False)
+        profil.user = user
+        profil.adresse = adresse
+        profil.save()
         return render(request, 'userenattente.html')
-    #         username = form.cleaned_data['username']
-    #         password = form.cleaned_data['password1']
-    #         user = authenticate(username=username,password=password)
-    #         if user is not None:
-    #             if user.is_active:
-    #                 user.backend = 'django.contrib.auth.backends.ModelBackend'
-    #                 login(request, user)
-    #                 produits = Produit.objects.all()
-    #                 return render(request, 'index.html', {'produits': produits})
 
-    return render(request, 'register.html', {"form": form})
+    return render(request, 'register.html', {"form_adresse": form_adresse,"form_user": form_user,"form_profil": form_profil,})
 
 class ListeProduit(ListView):
     model = Produit
@@ -380,3 +381,5 @@ def chercher(request):
 #         context['typeFiltre'] = "producteur"
 #         context['filtre'] = context['user.username']
 #         return context
+
+

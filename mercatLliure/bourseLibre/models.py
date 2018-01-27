@@ -1,13 +1,13 @@
 # -*- coding: utf-8 -*-
 from django.db import models
-from django.contrib.auth.models import User
+from django.contrib.auth.models import User, AbstractUser
 from django.utils import timezone
 from django.db.models.signals import post_save
 from django.dispatch import receiver
 from django.core.validators import MinValueValidator
 from django.utils.timezone import now
 # from django.utils.formats import localize
-from address.models import AddressField
+#from address.models import AddressField
 import datetime
 from model_utils.managers import InheritanceManager
 import django_filters
@@ -17,6 +17,15 @@ from django.utils.translation import ugettext_lazy as _
 #from django.contrib.contenttypes.models import ContentType
 import decimal
 
+import requests
+
+# from location_field.models import spatial
+
+#from django.contrib.gis.db import models as models_gis
+# from django.contrib.gis.geos import Point
+#from geoposition.fields import GeopositionField
+
+#from django.contrib.gis.db.models import GeoManager
 
 class ChoixProduits():
     #couleurs = {'aliment':'#D8C457','vegetal':'#4CAF47','service':'#BE373A','objet':'#5B4694'}
@@ -52,17 +61,56 @@ def get_categorie_from_subcat(subcat):
             return typeProduit
     return "Categorie inconnue (souscategorie : " + str(subcat) +")"
 
+from django.contrib.gis.db import models as models_gis
+class Adresse(models.Model):
+    rue = models.CharField(max_length=200, blank=True, null=True)
+    code_postal = models.CharField(max_length=5, blank=True, null=True)
+    latitude = models.FloatField(blank=True, null=True)
+    longitude = models.FloatField(blank=True, null=True)
+    pays = models.CharField(max_length=12, blank=True, null=True)
+    telephone = models.FloatField(blank=True, null=True)
+
+    def save(self, *args, **kwargs):
+        ''' On save, update timestamps '''
+        address = self.rue + ", "+ self.code_postal + ", " + self.pays
+        api_key = "AIzaSyCmGcPj0ti_7aEagETrbJyHPbE3U6gVfSA"
+        api_response = requests.get(
+            'https://maps.googleapis.com/maps/api/geocode/json?address={0}&key={1}'.format(address, api_key))
+        api_response_dict = api_response.json()
+
+        if api_response_dict['status'] == 'OK':
+            self.latitude = api_response_dict['results'][0]['geometry']['location']['lat']
+            self.longitude = api_response_dict['results'][0]['geometry']['location']['lng']
+
+        return super(Adresse, self).save(*args, **kwargs)
+
+    def get_latitude(self):
+        if not self.latitude:
+            return '42.6976'
+        return str(self.latitude).replace(",",".")
+
+    def get_longitude(self):
+        if not self.longitude:
+            return '2.8954'
+        return str(self.longitude).replace(",",".")
 
 
+# class Profil(AbstractBaseUser):
 class Profil(models.Model):
     user = models.OneToOneField(User, on_delete = models.CASCADE)
     site_web = models.URLField(blank=True)
     description = models.TextField(null=True, default="")
     competences = models.TextField(null=True, default="")
-    adresse = AddressField(null=True)
+    adresse = models.OneToOneField(Adresse, on_delete=models.CASCADE)
     avatar = models.ImageField(null=True, blank=True, upload_to="avatars/")
     inscrit_newsletter = models.BooleanField(default=False)
     date_registration = models.DateTimeField(verbose_name="Date de création", editable=False)
+
+    # position = models_gis.PointField()
+    # code_postal = models_gis.CharField(max_length=5)
+    # #objects = GeoManager()
+    # lon = models.FloatField()
+    # lat = models.FloatField()
 
     def __str__(self):
         return self.user.username
@@ -74,6 +122,8 @@ class Profil(models.Model):
         ''' On save, update timestamps '''
         if not self.id:
             self.date_registration = now()
+        if not self.adresse:
+            self.adresse = Adresse.objects.create()
         return super(Profil, self).save(*args, **kwargs)
 
     def get_nom_class(self):
@@ -81,17 +131,18 @@ class Profil(models.Model):
 
     def get_absolute_url(self):
         return reverse('profil', kwargs={'user_id':self.id})
-
+#
 @receiver(post_save, sender=User)
 def create_user_profile(sender, instance, created, **kwargs):
-    if created:
-        Profil.objects.create(user=instance)
+    if created and instance.is_superuser:
+        adresse = Adresse.objects.create()
+        Profil.objects.create(user=instance, adresse=adresse)
         Panier.objects.create(user=Profil.objects.get(user=instance))
 
 
-@receiver(post_save, sender=User)
-def save_user_profile(sender, instance, **kwargs):
-    instance.profil.save()
+# @receiver(post_save, sender=User)
+# def save_user_profile(sender, instance, **kwargs):
+#     instance.profil.save()
 
 
 
@@ -494,3 +545,10 @@ class Item(models.Model):
             return 0
         return self.quantite * self.produit.get_prix()
     total_prix = property(total_prix)
+
+#
+# class Place(models_gis.Model):
+#     ville = models_gis.CharField(max_length=255)
+#     #location = spatial.LocationField(based_fields=['ville'], zoom=7, default=Point(1.0, 1.0))
+#     location = spatial.PlainLocationField(based_fields=['ville'], zoom=7)
+#     objects = models_gis.GeoManager()

@@ -1,36 +1,147 @@
-{% extends 'base.html' %} 
+
+{% extends 'base.html' %}
+{% load leaflet_tags %}
 {% block title %}Profil de {{ user.username }} {% endblock %}
 {% block subtitle %}
+<div class="row">
+  <div class="col-md-8">
 Profil de {{ user.username }}
+  </div>
+    <div class="col-md-4 textright">
+        <a href="{% url 'produit_lister' %}?producteur={{ user.username }}">
+            <button type="button" class="btn btn-success">
+                <span class="glyphicon glyphicon-plus"></span>&nbsp; Ses propositions
+            </button>
+        </a>
+    </div>
+  </div>
+  </div>
 {% endblock %}
 {% block content %}
-<ul>
+
+<div class="row">
+  <div class="col-md-6">
+    <table class="table table-condensed tablepanier table-striped">
+        <tbody>
+
+    <tr>
+        <td>Pseudo :</td>
+        <td>{{ user.username }}</td>
+    </tr>
   {% if user.get_full_name %}
-  <li>Utilisateur: {{ user.get_full_name }}</li>
+    <tr>
+        <td>Utilisateur :</td>
+        <td>{{ user.get_full_name }}</td>
+    </tr>
   {% endif %}
 
-  <li>Description: {{ user.profil.description }}</li>
+    <tr>
+        <td>Présentation : </td>
+        <td>{{ user.profil.description }}</td>
+    </tr>
+
   {% if user.profil.avatar %}
-  <li>avatar: {{ user.profil.avatar }}</li>
-  {%endif%}
+    <tr>
+        <td>Avatar : </td>
+        <td>{{ user.profil.avatar }}</td>
+    </tr>
+  {% endif %}
+
   {% if user.profil.site_web %}
-  <li>site_web: {{ user.profil.site_web }}</li>
-  {%endif%}
-  <li>inscrit_newsletter: {{ user.profil.inscrit_newsletter }}</li>
-  <li>date adhésion: {{ user.profil.date_registration }}</li>
-</ul>
-<script src="https://maps.googleapis.com/maps/api/js?callback=myMap"></script>
+    <tr>
+        <td>Site_web :</td>
+        <td> {{ user.profil.site_web }}</td>
+    </tr>
+  {% endif %}
+    <tr>
+        <td>Date d'adhésion :</td>
+        <td>{{ user.profil.date_registration }}</td>
+    </tr>
+    <tr>
+        <td>Compétences :</td>
+        <td>{{ user.profil.competences }}</td>
+    </tr>
+    {%if user.profil.adresse.rue %}
+    <tr>
+        <td>Adresse :</td>
+        <td>{{ user.profil.adresse.rue }}, {{ user.profil.adresse.code_postal }}</td>
+    </tr>
+  {% endif %}
+    {%if user.profil.adresse.code_postal %}
+    <tr>
+        <td>Code postal :</td>
+        <td>{{ user.profil.adresse.code_postal }}</td>
+    </tr>
+  {% endif %}
+    {%if user.profil.adresse.rue %}
+    <tr>
+        <td>Pays :</td>
+        <td>{{ user.profil.adresse.pays }}</td>
+    </tr>
+  {% endif %}
+    <tr>
+        <td>lat/lon :</td>
+        <td>{{ user.profil.adresse.latitude }} / {{ user.profil.adresse.longitude }} </td>
+    </tr>
+    </table>
+</div>
+
+  <div class="col-md-6">
+      <script type="text/javascript">
+    function map_init_basic (map, options) {
+      var lat = {{user.profil.adresse.get_latitude}};
+      var lon = {{user.profil.adresse.get_longitude}};
+        L.marker([lat, lon]).addTo(map);
+        map.panTo(new L.LatLng(lat, lon));
+    }
+</script>
+{% leaflet_map "yourmap" callback="window.map_init_basic" %}
+</div>
+</div>
+      {%comment%}
+    <script>
+      var map;
+      function initMap() {
+      var lat = {{user.profil.adresse.get_latitude}};
+      var lon = {{user.profil.adresse.get_longitude}};
+
+       map = new google.maps.Map(document.getElementById('map'), {
+          center: {lat: lat, lng: lon},
+          zoom: 6
+        });
+      //var marker = new google.maps.Marker({position:{lat: lat, lng: lon}});
+      //marker.setMap(map);
+      }
+    </script>
+    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyC10StWuCZHLPmSZCyfNEdmgZ7CTqdngy0&callback=initMap"
+    async defer></script>
+      {%endcomment%}
+{%comment%}
+    <div id="map"></div>
+
+
+
+<div id="myMap" style="width:80%;height:300px;"></div>
 <script>
 function myMap() {
-    var mapOptions = {
-        center: new google.maps.LatLng(51.5, -0.12),
-        zoom: 10,
-        mapTypeId: google.maps.MapTypeId.HYBRID
-    }
-var map = new google.maps.Map(document.getElementById("map"), mapOptions);
-}
+      var lat = {{user.profil.adresse.get_latitude}};
+      var lon = {{user.profil.adresse.get_longitude}};
+
+       map = new google.maps.Map(document.getElementById('map'), {
+          center: {lat: lat, lng: lon},
+          zoom: 6
+        });
+      var marker = new google.maps.Marker({position:{lat:lat, lng:lon}});
+      marker.setMap(map);
+};
 </script>
-<div id="map" style="width:400px;height:400px;"></div>
+
+   <script async defer
+      src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCmGcPj0ti_7aEagETrbJyHPbE3U6gVfSA&callback=myMap">
+    </script>
+    {%endcomment%}
+
+
 {% endblock %}
 
     

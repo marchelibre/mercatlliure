@@ -1,7 +1,7 @@
 
 {% block navBar %}
 
-    <nav class="navbar  navbar-expand-md fixed-top navbar-dark">
+    <nav class="navbar  navbar-expand-md fixed-top ">
         <div class="navbar-header">
         <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarsActuel" aria-controls="navbarSupportedContent" aria-expanded="true" aria-label="Toggle navigation">
             <span class="navbar-toggler-icon"></span><span class="navbar-toggler-icon"></span><span class="navbar-toggler-icon"></span>
@@ -28,10 +28,17 @@
                 </ul>
 
                 <ul class="nav navbar-nav navbar-right">
-                    <li class="nav-item"><a class="nav-link" href="{% url 'panier_afficher' %}">panier</a></li>
-                    <li class="nav-item"><a class="nav-link" href="{% url 'profilcourant' %}">profil: {{request.user}}</a></li>
-                    <li class="nav-item"><a class="nav-link" href="{% url 'logout_user' %}">logout</a></li>
-                    <li class="nav-item"><a class="nav-link" href="{% url 'contact' %}"> Contact</a></li>
+                    <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle" href="{% url 'profilcourant' %}" id="navbarDropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                     profil: {{request.user}}
+                    </a>
+                    <div class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
+                        <a class="nav-link" href="{% url 'profilcourant' %}">Voir le profil</a>
+                        <a class="nav-link" href="{% url 'panier_afficher' %}">Voir le panier</a>
+                        <a class="nav-link" href="{% url 'logout_user' %}">logout</a>
+                    </div>
+                  </li>
+                   <li class="nav-item"><a class="nav-link" href="{% url 'contact' %}"> Contact</a></li>
 
                     {% if user.is_superuser %}
                     {% load admin_urls %}
@@ -41,6 +48,7 @@
             {% else %}
                 <ul class="nav navbar-nav mr-auto navbar-left">
                 <li class="nav-item"><a class="nav-link" href="{% url 'login_user' %}">login</a></li>
+                <li class="nav-item"><a class="nav-link" >utilisateur non identifié</a></li>
                 </ul>
                 {% endif %}
         </div>

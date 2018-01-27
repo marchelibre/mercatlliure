@@ -1,5 +1,6 @@
 {% load static %}
 {% load staticfiles %}
+{% load leaflet_tags %}
 <!DOCTYPE html>
 <html>
 <head>
@@ -27,6 +28,8 @@ x
     <script src="{% static 'js/bourseLibre.js' %}" type="text/javascript"></script>
 
     <meta name="viewport" content="width=device-width, initial-scale = 1.0"/>
+    {% leaflet_js %}
+    {% leaflet_css %}
 </head>
 
 
@@ -35,7 +38,9 @@ x
 <div class="container-fluid">
 	<div class="row">
 		<div class="col-md-12">
+            {% block navbar%}
             {% include 'navigationBar.html' %}
+            {% endblock%}
 
         <div class="panel bodycontenucomplet h-100">
             <div class="panel-heading soustitre">
