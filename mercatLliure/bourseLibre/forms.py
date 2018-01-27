@@ -293,11 +293,17 @@ class ProducteurChangeForm(UserChangeForm):
 
 
 class ContactForm(forms.Form):
-    envoyeur = forms.EmailField(label="Votre adresse mail")
+    #envoyeur = forms.EmailField(label="Votre adresse mail")
     sujet = forms.CharField(max_length=100)
     message = forms.CharField(widget=forms.Textarea)
-    # renvoi = forms.BooleanField(label="recevoir une copie",
-    #                             help_text="Cochez si vous souhaitez obtenir une copie du mail envoyé.", required=False)
+    renvoi = forms.BooleanField(label="recevoir une copie",
+                                #help_text="Cochez si vous souhaitez obtenir une copie du mail envoyé.", required=False
+                                 )
+
+    def __init__(self, request, *args, **kwargs):
+        super(ContactForm, self).__init__(request, *args, **kwargs)
+        if request:
+            self.fields['envoyeur'].initial = request.user.email
     # class UserForm(forms.ModelForm):
     #     class Meta:
     #         model = User

@@ -61,37 +61,46 @@ def get_categorie_from_subcat(subcat):
             return typeProduit
     return "Categorie inconnue (souscategorie : " + str(subcat) +")"
 
-from django.contrib.gis.db import models as models_gis
+LATITUDE_DEFAUT = '42.6976'
+LONGITUDE_DEFAUT = '2.8954'
+#from django.contrib.gis.db import models as models_gis
 class Adresse(models.Model):
     rue = models.CharField(max_length=200, blank=True, null=True)
-    code_postal = models.CharField(max_length=5, blank=True, null=True)
-    latitude = models.FloatField(blank=True, null=True)
-    longitude = models.FloatField(blank=True, null=True)
-    pays = models.CharField(max_length=12, blank=True, null=True)
+    code_postal = models.CharField(max_length=5, blank=True, null=True, default="66000")
+    latitude = models.FloatField(blank=True, null=True, default=LATITUDE_DEFAUT)
+    longitude = models.FloatField(blank=True, null=True, default=LONGITUDE_DEFAUT)
+    pays = models.CharField(max_length=12, blank=True, null=True, default="France")
     telephone = models.FloatField(blank=True, null=True)
 
     def save(self, *args, **kwargs):
         ''' On save, update timestamps '''
-        address = self.rue + ", "+ self.code_postal + ", " + self.pays
+        self.set_latlon_from_adresse()
+        return super(Adresse, self).save(*args, **kwargs)
+
+    def set_latlon_from_adresse(self):
+        address = ''
+        if self.rue:
+            address += self.rue + ", "
+        address += self.code_postal + ", " + self.pays
         api_key = "AIzaSyCmGcPj0ti_7aEagETrbJyHPbE3U6gVfSA"
-        api_response = requests.get(
-            'https://maps.googleapis.com/maps/api/geocode/json?address={0}&key={1}'.format(address, api_key))
+        api_response = requests.get('https://maps.googleapis.com/maps/api/geocode/json?address={0}&key={1}'.format(address, api_key))
         api_response_dict = api_response.json()
 
         if api_response_dict['status'] == 'OK':
             self.latitude = api_response_dict['results'][0]['geometry']['location']['lat']
             self.longitude = api_response_dict['results'][0]['geometry']['location']['lng']
 
-        return super(Adresse, self).save(*args, **kwargs)
+
+
 
     def get_latitude(self):
         if not self.latitude:
-            return '42.6976'
+            return LATITUDE_DEFAUT
         return str(self.latitude).replace(",",".")
 
     def get_longitude(self):
         if not self.longitude:
-            return '2.8954'
+            return LONGITUDE_DEFAUT
         return str(self.longitude).replace(",",".")
 
 
@@ -102,7 +111,7 @@ class Profil(models.Model):
     description = models.TextField(null=True, default="")
     competences = models.TextField(null=True, default="")
     adresse = models.OneToOneField(Adresse, on_delete=models.CASCADE)
-    avatar = models.ImageField(null=True, blank=True, upload_to="avatars/")
+    avatar = models.ImageField(null=True, blank=True, upload_to="avatars/", default='avatar/avatar-defaut2.jpg')
     inscrit_newsletter = models.BooleanField(default=False)
     date_registration = models.DateTimeField(verbose_name="Date de création", editable=False)
 

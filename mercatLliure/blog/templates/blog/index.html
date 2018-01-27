@@ -1,11 +1,71 @@
-{% extends 'blog/baseBlog.html' %} 
+{% extends 'blog/baseBlog.html' %}
+{%block subtitle%}
+
+<div class="row align-items-center">
+<div class="col-md-9 textcenter">
+    <div class="btn-group">
+        <a href="?">
+            <button class="btn {% if typeFiltre == "aucun" %}btn-primary {%endif%}">Tout </button>
+        </a>
+        <div class="btn-group">
+            <a {% if request.GET.auteur %} href="{%url 'profil_nom' request.GET.auteur %}"
+                {%else%}href="#" {%endif%}>
+                <button type="button" class="btn {% if request.GET.auteur %}btn-primary{%endif%}">
+                {% if request.GET.auteur %} Par: {{request.GET.auteur}} {%else%}Auteur{%endif%}
+                </button>
+            </a>
+             <button type="button" class="btn {% if request.GET.auteur %}btn-primary{%endif%}  dropdown-toggle dropdown-toggle-split" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"
+               data-target = "#idAuteur">
+                <span class="sr-only">Toggle Dropdown</span>
+              </button>
+            <div class="dropdown-menu"  aria-labelledby="menuAuteur"  id=idAuteur">
+                {% for auteur in auteur_list %}
+                  <a class="dropdown-item" href="?auteur={{auteur}}">{{auteur}}</a>
+                {% endfor %}
+            </div>
+        </div>
+        <div class="btn-group">
+            <a {% if request.GET.categorie %}  href="?categorie={{categorie}}" request.GET.categorie %}"
+                {%else%}href="#" {%endif%}>
+                <button type="button" class="btn {% if request.GET.categorie %}btn-primary{%endif%}">
+                {% if request.GET.categorie %} Par: {{request.GET.categorie}} {%else%}Catégorie{%endif%}
+                </button>
+            </a>
+             <button type="button" class="btn {% if request.GET.categorie %}btn-primary{%endif%}  dropdown-toggle dropdown-toggle-split" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"
+               data-target = "#idAuteur">
+                <span class="sr-only">Toggle Dropdown</span>
+              </button>
+            <div class="dropdown-menu"  aria-labelledby="menuAuteur"  id=idAuteur">
+                {% for categorie in categorie_list %}
+                  <a class="dropdown-item" href="?categorie={{categorie}}">{{categorie}}</a>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+</div>
+    <div class="col-md-3 textcenter">
+        <a href="{% url 'blog:ajouterNouvelArticle' %}">
+            <button type="button" class="btn btn-success">
+                <span class="glyphicon glyphicon-plus"></span>&nbsp; Ajouter un article
+            </button>
+        </a>
+    </div>
+</div>
+{%endblock%}
 {% block content %}
-<h1>Bienvenue sur le blog !!</h1>
-{% for p in posts %}
-<a href="{% url 'lireArticle' slug=article.slug %}">
-<p>{{p.title}}, 
-Auteur: {{p.author.name}} le {{p.date}} {{p.body|truncate_words(8)}} </p>
-<p>Lire la suite...</a></p>
+{% for article in article_list %}
+<div class="article">
+    <a href="{% url 'blog:lireArticle' slug=article.slug %}">
+        <h3>{{ article.titre }}</h3>
+        <p class="infos"> Catégorie: {{ article.categorie }}, rédigé par {{ article.auteur }}, le {{ article.date|date:"DATE_FORMAT" }}</p>
+        <p>{{ article.contenu|truncatechars:180 }}</p>
+    </a>
+    {% if not forloop.last %}
+    <hr>
+    {%endif%}
+</div>
+{% empty %}
+<p>Aucun article.</p>
 {% endfor %}
 
 {% endblock %}

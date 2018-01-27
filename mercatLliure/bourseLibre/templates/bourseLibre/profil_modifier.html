@@ -1,0 +1,16 @@
+{% extends 'base.html' %}
+{% block title %}Modifier profil{% endblock %}
+{% block subtitle %}
+Modifier votre profil
+{% endblock %}
+
+{% block content %}
+<div class="row-sm-12 row-lg-6 mx-auto "style="display:flex;justify-content:center;align-items:center;">
+
+
+<form action="" method="post">{% csrf_token %}
+    {{ form.as_p }}
+    <input type="submit" value="Update" />
+</form>
+</div>
+{% endblock %}

@@ -9,7 +9,7 @@
 {%if produit.user.id|is_numeric%}
 <a class="infos" href="{% url 'profil' produit.user.id %}">{{produit.user.user.username}}</a><a class="infos">, le {{ produit.date_creation }}</a>
 {%else%}
-<a class="infos" href="{% url 'profilInconnu' %}">un producteur disparu !</a><a class="infos">, le {{ produit.date_creation }}</a>
+<a class="infos" href="{% url 'profil_inconnu' %}">un producteur disparu !</a><a class="infos">, le {{ produit.date_creation }}</a>
 {% endif %}
 	</div>
 {% endblock %}

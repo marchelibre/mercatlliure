@@ -62,6 +62,31 @@ def lireArticle(request, slug):
 
 class ListeArticles(ListView):
     model = Article
-    context_object_name = "derniers_articles"
-    template_name = "blog/accueil.html"
-    paginate_by = 5
+    context_object_name = "article_list"
+    template_name = "blog/index.html"
+    paginate_by = 10
+
+    def get_queryset(self):
+        qs = Article.objects.all()
+        params = dict(self.request.GET.items())
+
+        if "auteur" in params:
+            qs = qs.filter(auteur__user__username=params['auteur'])
+        if "categorie" in params:
+            qs = qs.filter(categorie=params['categorie'])
+
+        return qs.order_by('categorie', 'date', 'auteur')
+
+    def get_context_data(self, **kwargs):
+        # Call the base implementation first to get a context
+        context = super().get_context_data(**kwargs)
+
+        # context['producteur_list'] = Profil.objects.values_list('user__username', flat=True).distinct()
+        context['auteur_list'] = Article.objects.all().values_list('auteur__user__username', flat=True).distinct()
+        context['categorie_list'] = Article.objects.all().values_list('categorie', flat=True).distinct()
+        context['typeFiltre'] = "aucun"
+        if 'auteur' in self.request.GET:
+            context['typeFiltre'] = "auteur"
+        if 'categorie' in self.request.GET:
+            context['typeFiltre'] = "categorie"
+        return context

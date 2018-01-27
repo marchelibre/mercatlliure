@@ -16,7 +16,7 @@ from bourseLibre.models import Profil
     
 class Article(models.Model):
     categorie = models.CharField(max_length=30,         
-        choices=(('Histoire', 'Histoire'), ('Bon plan', 'Bon plan'), ('Descriptif', 'Descriptif'), ('autre','autre'),),
+        choices=(('Histoire', 'Histoire'), ('Jardinage','Jardinage'),  ('Bricolage','Bricolage'), ('Culture','Culture'), ('Bon plan', 'Bon plan'), ('Point', 'Point de vue'), ('Recette', 'Recette'), ('autre','autre'),),
         default='Histoire', verbose_name="categorie")
     titre = models.CharField(max_length=100)
     auteur = models.ForeignKey(Profil, on_delete=models.CASCADE)

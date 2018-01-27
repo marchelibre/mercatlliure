@@ -1,13 +1,33 @@
 
 {% extends 'base.html' %}
+{% block headerDocument%}
 {% load leaflet_tags %}
+{%endblock%}
+{%block header %}
+{% leaflet_js %}
+{% leaflet_css %}
+{%endblock%}
 {% block title %}Profil de {{ user.username }} {% endblock %}
 {% block subtitle %}
 <div class="row">
   <div class="col-md-8">
-Profil de {{ user.username }}
+    <p> Profil de {{ user.username }}
+      {%if request.user.id == user.id %}
+        <a href="{% url 'profil_modifier' %}">
+            <button type="button" class="btn btn-sm btn-warning">
+                <span class="glyphicon glyphicon-plus"></span>&nbsp;Modifier le profil
+            </button>
+        </a>
+      {%endif%}
+    </p>
+
   </div>
     <div class="col-md-4 textright">
+        <a href="{% url 'profil_contact' user.id %}">
+            <button type="button" class="btn btn-success">
+                <span class="glyphicon glyphicon-envelope"></span>Message
+            </button>
+        </a>
         <a href="{% url 'produit_lister' %}?producteur={{ user.username }}">
             <button type="button" class="btn btn-success">
                 <span class="glyphicon glyphicon-plus"></span>&nbsp; Ses propositions
@@ -30,20 +50,20 @@ Profil de {{ user.username }}
     </tr>
   {% if user.get_full_name %}
     <tr>
-        <td>Utilisateur :</td>
+        <td>Nom :</td>
         <td>{{ user.get_full_name }}</td>
     </tr>
   {% endif %}
 
     <tr>
-        <td>Présentation : </td>
+        <td></td>
         <td>{{ user.profil.description }}</td>
     </tr>
 
   {% if user.profil.avatar %}
     <tr>
         <td>Avatar : </td>
-        <td>{{ user.profil.avatar }}</td>
+        <td>            <img src="{{ produit.avatar.url }}" alt="pas d'image" style="width:128px;height:128px"></td>
     </tr>
   {% endif %}
 
@@ -94,9 +114,9 @@ Profil de {{ user.username }}
 
   <div class="col-md-6">
       <script type="text/javascript">
-    function map_init_basic (map, options) {
-      var lat = {{user.profil.adresse.get_latitude}};
-      var lon = {{user.profil.adresse.get_longitude}};
+        function map_init_basic (map, options) {
+        var lat = {{user.profil.adresse.get_latitude}};
+        var lon = {{user.profil.adresse.get_longitude}};
         L.marker([lat, lon]).addTo(map);
         map.panTo(new L.LatLng(lat, lon));
     }

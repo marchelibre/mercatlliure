@@ -40,7 +40,7 @@ ul.errorlist > li {
     border-radius: 0.4em;
     border: 2px solid #053200;
     box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
-    background-color:grey;
+    background-color:#4d9900;
 
 }
 
@@ -162,6 +162,9 @@ ul.errorlist > li {
 
 .tablepanier{
     background-color:#87ceeb;
+}
+.tableprofils{
+    background-color: #ffffcc;
 }
 
 .offre_entree{

@@ -14,7 +14,7 @@ from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.decorators import login_required
 from django.views.generic import ListView, UpdateView, DeleteView
 from django.urls import reverse_lazy
-from django.core.mail import mail_admins
+from django.core.mail import mail_admins, send_mail
 # from itertools import chain
 from django.db.models import Q
 
@@ -118,7 +118,7 @@ def merci(request, template_name='merci.html'):
 #         else:
 #             return render(request, 'index.html', {'produits': produits})
 
-def profilcourant(request, ):
+def profil_courant(request, ):
     user = get_object_or_404(User, id=request.user.id)
 
 
@@ -135,18 +135,48 @@ def profil(request, user_id):
         #     user = User.objects.get(username=kwargs['user_username'])
         #     return render(request, 'profil.html', {'user': user})
         # except User.DoesNotExist:
-            return render(request, 'profilInconnu.html', {'userid': user_id})
+            return render(request, 'profil_inconnu.html', {'userid': user_id})
 
 def profil_nom(request, user_username):
     try:
         user = User.objects.get(username=user_username)
         return render(request, 'profil.html', {'user': user})
     except User.DoesNotExist:
-        return render(request, 'profilInconnu.html', {'userid': user_id})
+        return render(request, 'profil_inconnu.html', {'userid': user_username})
 
-def profilInconnu(request):
-    return render(request, 'profilInconnu.html')
+def profil_inconnu(request):
+    return render(request, 'profil_inconnu.html')
 
+def profil_list(request):
+    users = Profil.objects.all()
+    return render(request, 'cooperateurs.html', {'users':users, } )
+
+def profil_contact(request, user_id):
+    form = ContactForm(request.POST or None)
+    user = Profil.objects.get(id=user_id)
+    if form.is_valid():
+        sujet = form.cleaned_data['sujet']
+        message = form.cleaned_data['message'] + '(par : ' + form.cleaned_data['envoyeur'] + ')'
+        mail_admins(sujet, message)
+        send_mail(
+            sujet,
+            message,
+            request.user.email,
+            user.user.email,
+            fail_silently=False,
+            )
+        # if renvoi:
+        #     mess = "message envoyé a la bourse libre : \\n"
+        #     send_mail( sujet,mess + message, envoyeur, to=[envoyeur], fail_silently=False,)
+    return render(request, 'profil_contact.html', {'form': form, 'user':user})
+
+
+# @login_required(login_url='/login/')
+class profil_modifier(UpdateView):
+    model = Profil
+    template_name_suffix = '_modifier'
+    fields = ['user','site_web','description', 'competences', 'adresse', 'avatar', 'inscrit_newsletter']
+#profil.set_latlon_from_adresse()
 
 def register(request):
     form_adresse = AdresseForm(request.POST or None)
@@ -173,7 +203,7 @@ class ListeProduit(ListView):
     def get_queryset(self):
         qs = Produit.objects.select_subclasses()
         params = dict(self.request.GET.items())
-        categorie = None
+
         if "producteur" in params:
             qs = qs.filter(user__user__username=params['producteur'])
         if "categorie" in params:
@@ -211,6 +241,12 @@ class ListeProduit(ListView):
             context['categorie_parent'] = self.request.GET['categorie']
             context['typeFiltre'] = "categorie"
         return context
+
+def charte(request):
+    return render(request, 'charte.html', )
+
+def fairedon(request):
+    return render(request, 'fairedon.html', )
 
 def contact(request):
     form = ContactForm(request.POST or None)
@@ -275,6 +311,7 @@ def chercher(request):
     else:
         produits_list = []
     return render(request, 'chercher.html', {'recherche':recherche, 'produits_list':produits_list})
+
 
 
 

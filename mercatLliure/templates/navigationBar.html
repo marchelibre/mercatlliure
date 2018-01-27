@@ -18,7 +18,7 @@
                 <form class="form-inline my-2 my-lg-0" action="{% url 'chercher' %}" method="get">
                     {% csrf_token %}
                     <input class="form-control mr-sm-2" name="id_recherche" placeholder="Chercher un produit..." type="text">
-                    <button class="btn btn-outline-success my-2 my-sm-0" type="submit" >...</button>
+                    <button class="btn btn-info my-2 my-sm-0" type="submit" >...</button>
                 </form>
                     </li>
                     <li class="nav-item"><a class="nav-link" href="{% url 'blog:accueil' %}">Blog</a> </li>
@@ -29,17 +29,26 @@
 
                 <ul class="nav navbar-nav navbar-right">
                     <li class="nav-item dropdown">
-                    <a class="nav-link dropdown-toggle" href="{% url 'profilcourant' %}" id="navbarDropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                    <a class="nav-link dropdown-toggle" href="{% url 'profil_courant' %}" id="navbarDropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                      profil: {{request.user}}
                     </a>
                     <div class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
-                        <a class="nav-link" href="{% url 'profilcourant' %}">Voir le profil</a>
+                        <a class="nav-link" href="{% url 'profil_courant' %}">Voir le profil</a>
                         <a class="nav-link" href="{% url 'panier_afficher' %}">Voir le panier</a>
                         <a class="nav-link" href="{% url 'logout_user' %}">logout</a>
                     </div>
                   </li>
-                   <li class="nav-item"><a class="nav-link" href="{% url 'contact' %}"> Contact</a></li>
-
+                    <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle" href="{% url 'profil_courant' %}" id="navbarAbout" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                     A propos
+                    </a>
+                    <div class="dropdown-menu" aria-labelledby="navbarAbout">
+                        <a class="nav-link" href="{% url 'profil_list' %}"> Les coopérateurs</a>
+                        <a class="nav-link" href="{% url 'contact' %}"> Contact </a>
+                        <a class="nav-link" href="{% url 'charte' %}"> Charte </a>
+                        <a class="nav-link" href="{% url 'fairedon' %}"> Faire un don</a>
+                    </div>
+                  </li>
                     {% if user.is_superuser %}
                     {% load admin_urls %}
                     <li class="nav-item"><a class="nav-link" href="{% url 'admin:index' %}">admin</a></li>
@@ -48,7 +57,6 @@
             {% else %}
                 <ul class="nav navbar-nav mr-auto navbar-left">
                 <li class="nav-item"><a class="nav-link" href="{% url 'login_user' %}">login</a></li>
-                <li class="nav-item"><a class="nav-link" >utilisateur non identifié</a></li>
                 </ul>
                 {% endif %}
         </div>

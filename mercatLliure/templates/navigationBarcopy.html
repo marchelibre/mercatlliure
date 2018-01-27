@@ -25,7 +25,7 @@
             </form>
             {%endcomment%}
             <ul class=" navbar-nav navbar-right">
-                <li class="nav-item"><a class="nav-link" href="{% url 'profilcourant' %}">profil</a></li>
+                <li class="nav-item"><a class="nav-link" href="{% url 'profil_courant' %}">profil</a></li>
                 <li class="nav-item"><a class="nav-link" href="{% url 'logout_user' %}">logout</a></li>
 
                 {% if user.is_superuser %}

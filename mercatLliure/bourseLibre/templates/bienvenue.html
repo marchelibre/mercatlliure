@@ -3,7 +3,7 @@
 
 			<div class="jumbotron well">
 {% block subtitle %}
-<h1 class = "textcenter">Benvingut al Mercat Lliure</h1>
+<h1 class = "textcenter">Benvingut {% if request.user.is_autenticated %}request.user.username{%endif%}al Mercat Lliure</h1>
 
 <h3 class = "textcenter"> Mercat 100% gratuït i lliure !</h3>
 <h3 class = "textcenter"> De producteurs à producteurs de richesse !</h3>
