@@ -73,10 +73,16 @@ Profil de {{ user.username }}
         <td>{{ user.profil.adresse.code_postal }}</td>
     </tr>
   {% endif %}
-    {%if user.profil.adresse.rue %}
+    {%if user.profil.adresse.pays %}
     <tr>
         <td>Pays :</td>
         <td>{{ user.profil.adresse.pays }}</td>
+    </tr>
+  {% endif %}
+    {%if user.profil.adresse.telephone %}
+    <tr>
+        <td>Téléphone :</td>
+        <td>{{ user.profil.adresse.telephone }}</td>
     </tr>
   {% endif %}
     <tr>

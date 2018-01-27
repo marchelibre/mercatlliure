@@ -2,20 +2,9 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="9ec2ec56-6011-4267-87a5-fd6d58ded41d" name="Default" comment="">
-      <change type="DELETED" beforePath="$PROJECT_DIR$/db.sqlite3" afterPath="" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/db.sqlite3" afterPath="$PROJECT_DIR$/db.sqlite3" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/bourseLibre/admin.py" afterPath="$PROJECT_DIR$/bourseLibre/admin.py" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/bourseLibre/forms.py" afterPath="$PROJECT_DIR$/bourseLibre/forms.py" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/bourseLibre/models.py" afterPath="$PROJECT_DIR$/bourseLibre/models.py" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/bourseLibre/settings.py" afterPath="$PROJECT_DIR$/bourseLibre/settings.py" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/bourseLibre/templates/panier.html" afterPath="$PROJECT_DIR$/bourseLibre/templates/panier.html" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/bourseLibre/templates/profil.html" afterPath="$PROJECT_DIR$/bourseLibre/templates/profil.html" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/bourseLibre/templates/register.html" afterPath="$PROJECT_DIR$/bourseLibre/templates/register.html" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/bourseLibre/templates/userenattente.html" afterPath="$PROJECT_DIR$/bourseLibre/templates/userenattente.html" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/bourseLibre/urls.py" afterPath="$PROJECT_DIR$/bourseLibre/urls.py" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/bourseLibre/views.py" afterPath="$PROJECT_DIR$/bourseLibre/views.py" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/templates/base.html" afterPath="$PROJECT_DIR$/templates/base.html" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/templates/navigationBar.html" afterPath="$PROJECT_DIR$/templates/navigationBar.html" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="TRACKING_ENABLED" value="true" />
@@ -84,8 +73,8 @@
       <file leaf-file-name="views.py" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/bourseLibre/views.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="-181">
-              <caret line="166" column="6" lean-forward="false" selection-start-line="166" selection-start-column="6" selection-end-line="166" selection-end-column="6" />
+            <state relative-caret-position="77">
+              <caret line="121" column="12" lean-forward="false" selection-start-line="121" selection-start-column="12" selection-end-line="121" selection-end-column="12" />
               <folding>
                 <element signature="e#75#174#0" expanded="true" />
               </folding>
@@ -106,8 +95,8 @@
       <file leaf-file-name="urls.py" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/bourseLibre/urls.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="75">
-              <caret line="57" column="59" lean-forward="false" selection-start-line="57" selection-start-column="59" selection-end-line="57" selection-end-column="59" />
+            <state relative-caret-position="108">
+              <caret line="44" column="0" lean-forward="false" selection-start-line="44" selection-start-column="0" selection-end-line="44" selection-end-column="0" />
               <folding />
             </state>
           </provider>
@@ -116,8 +105,8 @@
       <file leaf-file-name="profil.html" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/bourseLibre/templates/profil.html">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="312">
-              <caret line="78" column="41" lean-forward="true" selection-start-line="78" selection-start-column="41" selection-end-line="78" selection-end-column="41" />
+            <state relative-caret-position="90">
+              <caret line="73" column="9" lean-forward="true" selection-start-line="73" selection-start-column="9" selection-end-line="73" selection-end-column="9" />
               <folding>
                 <element signature="e#451#457#0" expanded="true" />
                 <element signature="n#style#0;n#div#3;n#!!top" expanded="true" />
@@ -148,8 +137,6 @@
   </component>
   <component name="FindInProjectRecents">
     <findStrings>
-      <find>modifierProduit</find>
-      <find>with</find>
       <find>models.Panier</find>
       <find>models.Item</find>
       <find>Item</find>
@@ -176,8 +163,10 @@
       <find>request.GET.producteur_id</find>
       <find>get_categorie_from_subcat</find>
       <find>navbar</find>
-      <find>login</find>
       <find>addre</find>
+      <find>login</find>
+      <find>user.profil</find>
+      <find>DoesNotExist</find>
     </findStrings>
     <replaceStrings>
       <replace>souscategorie</replace>
@@ -200,6 +189,8 @@
       <replace>g.length</replace>
       <replace>request.GET.producteur_id</replace>
       <replace>request.GET.producteur</replace>
+      <replace>profil.user.</replace>
+      <replace>profil</replace>
     </replaceStrings>
     <dirStrings>
       <dir>$PROJECT_DIR$</dir>
@@ -260,7 +251,6 @@
         <option value="$PROJECT_DIR$/bourseLibre/templates/register.html" />
         <option value="$PROJECT_DIR$/bourseLibre/urls.py" />
         <option value="$PROJECT_DIR$/bourseLibre/templates/userenattente.html" />
-        <option value="$PROJECT_DIR$/bourseLibre/views.py" />
         <option value="$PROJECT_DIR$/bourseLibre/templates/login.html" />
         <option value="$PROJECT_DIR$/bourseLibre/settings.py" />
         <option value="$PROJECT_DIR$/templates/base.html" />
@@ -268,6 +258,7 @@
         <option value="$PROJECT_DIR$/templates/navigationBar.html" />
         <option value="$PROJECT_DIR$/bourseLibre/models.py" />
         <option value="$PROJECT_DIR$/bourseLibre/templates/panier.html" />
+        <option value="$PROJECT_DIR$/bourseLibre/views.py" />
         <option value="$PROJECT_DIR$/bourseLibre/templates/profil.html" />
       </list>
     </option>
@@ -548,7 +539,14 @@
       <option name="project" value="LOCAL" />
       <updated>1516840909539</updated>
     </task>
-    <option name="localTasksCounter" value="4" />
+    <task id="LOCAL-00004" summary="profils avec map et login">
+      <created>1517013636138</created>
+      <option name="number" value="00004" />
+      <option name="presentableId" value="LOCAL-00004" />
+      <option name="project" value="LOCAL" />
+      <updated>1517013636138</updated>
+    </task>
+    <option name="localTasksCounter" value="5" />
     <servers />
   </component>
   <component name="TodoView" selected-index="4">
@@ -563,7 +561,7 @@
   <component name="ToolWindowManager">
     <frame x="0" y="1" width="1366" height="743" extended-state="0" />
     <layout>
-      <window_info id="Project" active="true" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.21396054" sideWeight="0.5" order="0" side_tool="false" content_ui="combo" />
+      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.21396054" sideWeight="0.5" order="0" side_tool="false" content_ui="combo" />
       <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32935154" sideWeight="0.4969651" order="9" side_tool="false" content_ui="tabs" />
       <window_info id="Hierarchy" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.24962063" sideWeight="0.5" order="3" side_tool="false" content_ui="combo" />
       <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25085324" sideWeight="0.5599393" order="0" side_tool="true" content_ui="tabs" />
@@ -602,7 +600,8 @@
     <MESSAGE value="Correction script + filtrage produits" />
     <MESSAGE value="serveur de recherche" />
     <MESSAGE value="bootstrap menu nav" />
-    <option name="LAST_COMMIT_MESSAGE" value="bootstrap menu nav" />
+    <MESSAGE value="profils avec map et login" />
+    <option name="LAST_COMMIT_MESSAGE" value="profils avec map et login" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
@@ -686,11 +685,6 @@
           <url>file://$PROJECT_DIR$/bourseLibre/models.py</url>
           <line>137</line>
           <option name="timeStamp" value="75" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
-          <url>file://$PROJECT_DIR$/bourseLibre/urls.py</url>
-          <line>44</line>
-          <option name="timeStamp" value="76" />
         </line-breakpoint>
       </breakpoints>
       <default-breakpoints>
@@ -1047,24 +1041,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/bourseLibre/views.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-181">
-          <caret line="166" column="6" lean-forward="false" selection-start-line="166" selection-start-column="6" selection-end-line="166" selection-end-column="6" />
-          <folding>
-            <element signature="e#75#174#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/bourseLibre/urls.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="75">
-          <caret line="57" column="59" lean-forward="false" selection-start-line="57" selection-start-column="59" selection-end-line="57" selection-end-column="59" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/templates/navigationBar.html">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="140">
@@ -1083,6 +1059,14 @@
         </state>
       </provider>
     </entry>
+    <entry file="file://$PROJECT_DIR$/bourseLibre/templates/panier.html">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="340">
+          <caret line="35" column="39" lean-forward="true" selection-start-line="35" selection-start-column="39" selection-end-line="35" selection-end-column="39" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/bourseLibre/models.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="159">
@@ -1093,18 +1077,28 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/bourseLibre/templates/panier.html">
+    <entry file="file://$PROJECT_DIR$/bourseLibre/urls.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="340">
-          <caret line="35" column="39" lean-forward="true" selection-start-line="35" selection-start-column="39" selection-end-line="35" selection-end-column="39" />
+        <state relative-caret-position="108">
+          <caret line="44" column="0" lean-forward="false" selection-start-line="44" selection-start-column="0" selection-end-line="44" selection-end-column="0" />
           <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/bourseLibre/views.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="77">
+          <caret line="121" column="12" lean-forward="false" selection-start-line="121" selection-start-column="12" selection-end-line="121" selection-end-column="12" />
+          <folding>
+            <element signature="e#75#174#0" expanded="true" />
+          </folding>
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/bourseLibre/templates/profil.html">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="312">
-          <caret line="78" column="41" lean-forward="true" selection-start-line="78" selection-start-column="41" selection-end-line="78" selection-end-column="41" />
+        <state relative-caret-position="90">
+          <caret line="73" column="9" lean-forward="true" selection-start-line="73" selection-start-column="9" selection-end-line="73" selection-end-column="9" />
           <folding>
             <element signature="e#451#457#0" expanded="true" />
             <element signature="n#style#0;n#div#3;n#!!top" expanded="true" />
