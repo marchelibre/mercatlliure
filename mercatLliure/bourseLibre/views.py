@@ -153,7 +153,7 @@ def profil_list(request):
 
 def profil_contact(request, user_id):
     form = ContactForm(request.POST or None)
-    user = Profil.objects.get(id=user_id)
+    recepteur = Profil.objects.get(id=user_id)
     if form.is_valid():
         sujet = form.cleaned_data['sujet']
         message = form.cleaned_data['message'] + '(par : ' + form.cleaned_data['envoyeur'] + ')'
@@ -162,13 +162,13 @@ def profil_contact(request, user_id):
             sujet,
             message,
             request.user.email,
-            user.user.email,
+            recepteur.user.email,
             fail_silently=False,
             )
         # if renvoi:
         #     mess = "message envoyé a la bourse libre : \\n"
         #     send_mail( sujet,mess + message, envoyeur, to=[envoyeur], fail_silently=False,)
-    return render(request, 'profil_contact.html', {'form': form, 'user':user})
+    return render(request, 'profil_contact.html', {'form': form, 'recepteur':recepteur})
 
 
 # @login_required(login_url='/login/')

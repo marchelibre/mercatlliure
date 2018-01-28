@@ -23,15 +23,12 @@
 
   </div>
     <div class="col-md-4 textright">
-        <a href="{% url 'profil_contact' user.id %}">
-            <button type="button" class="btn btn-success">
-                <span class="glyphicon glyphicon-envelope"></span>Message
-            </button>
+        <a href="{% url 'profil_contact' user.id %}" class="btn btn-success">
+          <span class="glyphicon glyphicon-envelope"></span> Message
         </a>
-        <a href="{% url 'produit_lister' %}?producteur={{ user.username }}">
-            <button type="button" class="btn btn-success">
+        <a href="{% url 'produit_lister' %}?producteur={{ user.username }}" class="btn btn-success">
                 <span class="glyphicon glyphicon-plus"></span>&nbsp; Ses propositions
-            </button>
+            </a>
         </a>
     </div>
   </div>
