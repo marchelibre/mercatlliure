@@ -11,7 +11,7 @@
             <a {% if request.GET.auteur %} href="{%url 'profil_nom' request.GET.auteur %}"
                 {%else%}href="#" {%endif%}>
                 <button type="button" class="btn {% if request.GET.auteur %}btn-primary{%endif%}">
-                {% if request.GET.auteur %} Par: {{request.GET.auteur}} {%else%}Auteur{%endif%}
+                {% if request.GET.auteur %} Auteur: {{request.GET.auteur}} {%else%}Auteur{%endif%}
                 </button>
             </a>
              <button type="button" class="btn {% if request.GET.auteur %}btn-primary{%endif%}  dropdown-toggle dropdown-toggle-split" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"
@@ -28,7 +28,7 @@
             <a {% if request.GET.categorie %}  href="?categorie={{categorie}}" request.GET.categorie %}"
                 {%else%}href="#" {%endif%}>
                 <button type="button" class="btn {% if request.GET.categorie %}btn-primary{%endif%}">
-                {% if request.GET.categorie %} Par: {{request.GET.categorie}} {%else%}Catégorie{%endif%}
+                {% if request.GET.categorie %} Catégorie: {{request.GET.categorie}} {%else%}Catégorie{%endif%}
                 </button>
             </a>
              <button type="button" class="btn {% if request.GET.categorie %}btn-primary{%endif%}  dropdown-toggle dropdown-toggle-split" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"
@@ -54,12 +54,14 @@
 {%endblock%}
 {% block content %}
 {% for article in article_list %}
-<div class="article">
-    <a href="{% url 'blog:lireArticle' slug=article.slug %}">
-        <h3>{{ article.titre }}</h3>
-        <p class="infos"> Catégorie: {{ article.categorie }}, rédigé par {{ article.auteur }}, le {{ article.date|date:"DATE_FORMAT" }}</p>
-        <p>{{ article.contenu|truncatechars:180 }}</p>
-    </a>
+    <div class="card article ">
+      <a href="{% url 'blog:lireArticle' slug=article.slug %}">
+  <div class="card-block">
+        <h4 class="card-title">{{ article.titre }}</h4>
+        <h6 class="card-subtitle mb-2 text-muted">Catégorie: {{ article.categorie }}, rédigé par {{ article.auteur }}, le {{ article.date|date:"DATE_FORMAT" }}</h6>
+        <p class="card-text">{{ article.contenu|truncatechars:180 }}</p>
+
+  </div>   </a>
     {% if not forloop.last %}
     <hr>
     {%endif%}

@@ -1,13 +1,25 @@
 {% extends 'blog/baseBlog.html' %}
 {% block subtitle %}
-{{ article.titre }}
+<div class="row">
+    <div class="col-md-10">
+        <p class="infos ">Dans: <a href="{% url 'blog:accueil'  %}?categorie={{article.categorie}}">{{ article.get_categorie_display }}</a>, rédigé par <a href="{% url 'profil' article.auteur.id %}"> {{ article.auteur.user.username }}</a>, le {{ article.date|date:"DATE_FORMAT" }}</p>
+    </div>
+    <div class="col-md-2">
+        <a  href="{% url 'blog:accueil'  %}">
+        <button class="btn btn-info textright" >Retour au sommaire</button>
+            </a>
+    </div>
+</div>
+
 {% endblock %}
 {% block content %}
-<p class="infos">Catégorie: {{ article.categorie }}, rédigé par <a href="{% url 'profil' article.auteur.user.id %}"> {{ article.auteur }}</a>, le {{ article.date|date:"DATE_FORMAT" }}</p>
-
-<div class="contenu">{{ article.contenu }}</div>
-<div class="textright" >
-    <a href="{% url 'blog:accueil'  %}"><button "class="btn btn-default" >Retour au sommaire</button></a>
+<div class="contenu article">
+<div class="row" >
+      <h3 style="text-indent: 20px;">  {{ article.titre }}</h3>
+</div>
+<div class="row">
+    {{ article.contenu }}
+</div>
 </div>
 
 {% if commentaires %}
@@ -16,8 +28,11 @@
 <h3>Commentaires</h3>
 <ol>
 {% for comment in commentaires %}
-        <li><p>Posté par: {{ comment.nom }} {% if comment.email%} {{ comment.email }}){%endif%}, le {{ comment.date_creation }} </p>
-        <p>{{ comment.commentaire }}</p></li>
+        <li><p>Posté par: {{ comment.auteur.username }}, le {{ comment.date_creation }} </p>
+<div class=" commentaire">
+        <h5 style="text-indent: 20px;">{{ comment.titre }}</h5>
+        <p>{{ comment.commentaire }}</p>
+</div>
 {% endfor %}
 </ol>
 </div>

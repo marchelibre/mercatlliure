@@ -44,7 +44,7 @@ class ChoixProduits():
         'type_prix': typePrixUnite,
     },
     'service': {
-        'souscategorie': ('jardinier', 'informaticien', 'electricen', 'plombier', 'mécanicien', 'autre'),
+        'souscategorie': ('jardinier', 'informaticien', 'electricien', 'plombier', 'mécanicien', 'autre'),
         'etat': (('excellent', 'excellent'), ('bon', 'bon'), ('moyen', 'moyen'), ('nul', 'nul')),
         'type_prix': (('h', 'heure'), ('un', 'unité')),
     },
@@ -71,6 +71,7 @@ class Adresse(models.Model):
     longitude = models.FloatField(blank=True, null=True, default=LONGITUDE_DEFAUT)
     pays = models.CharField(max_length=12, blank=True, null=True, default="France")
     telephone = models.FloatField(blank=True, null=True)
+    slug = models.SlugField(max_length=100)
 
     def save(self, *args, **kwargs):
         ''' On save, update timestamps '''
@@ -114,6 +115,7 @@ class Profil(models.Model):
     avatar = models.ImageField(null=True, blank=True, upload_to="avatars/", default='avatar/avatar-defaut2.jpg')
     inscrit_newsletter = models.BooleanField(default=False)
     date_registration = models.DateTimeField(verbose_name="Date de création", editable=False)
+    slug = models.SlugField(max_length=100)
 
     # position = models_gis.PointField()
     # code_postal = models_gis.CharField(max_length=5)
@@ -166,6 +168,7 @@ class Produit(models.Model):  # , BaseProduct):
     date_expiration = models.DateField(verbose_name='date_expiration', default=proposed_renewal_date, )
     nom_produit = models.CharField(max_length=250)
     description = models.TextField(blank=True, null=True)
+    slug = models.SlugField(max_length=100)
 
     stock_initial = models.FloatField(verbose_name="Quantité disponible", default=1, max_length=250,
                                       validators=[MinValueValidator(1), ])
@@ -177,7 +180,7 @@ class Produit(models.Model):  # , BaseProduct):
         default='lliure', verbose_name="monnaie"
     )
 
-    CHOIX_CATEGORIE = (('aliment', 'aliment'),('vegetal', 'vegetal'), ('service', 'service'), ('objet', 'objet'))
+    CHOIX_CATEGORIE = (('aliment', 'aliment'),('vegetal', 'végétal'), ('service', 'service'), ('objet', 'objet'))
     categorie = models.CharField(max_length=20,
                                  choices=CHOIX_CATEGORIE,
                                  default='aliment')

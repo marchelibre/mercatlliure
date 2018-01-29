@@ -10,20 +10,18 @@
         </div>
         <div class="collapse navbar-collapse" id="navbarsActuel">
             {% if user.is_authenticated %}
-                <ul class="nav navbar-nav mr-auto navbar-left">
+                <ul class="nav navbar-nav mr-auto mt-2 mt-md-0">
+                    <li class="nav-item"><a class="nav-link" href="{% url 'blog:accueil' %}">Blog</a> </li>
                     <li class="nav-item active">
                         <a class="nav-link" href="{% url 'produit_lister' %}">Propositions <span class="sr-only">(current)</span></a></li>
-                    <li class="nav-item active"><a class="nav-link" href="{% url 'produit_proposer_entree' %}">Proposer</a></li>
-                    <li>
+                     <li>
                 <form class="form-inline my-2 my-lg-0" action="{% url 'chercher' %}" method="get">
                     {% csrf_token %}
                     <input class="form-control mr-sm-2" name="id_recherche" placeholder="Chercher un produit..." type="text">
                     <button class="btn btn-info my-2 my-sm-0" type="submit" >...</button>
                 </form>
                     </li>
-                    <li class="nav-item"><a class="nav-link" href="{% url 'blog:accueil' %}">Blog</a> </li>
-                    <li class="nav-item"><a class="nav-link" href="{% url 'haystack_search' %}"> ?</a></li>
-                </ul>
+              </ul>
 
                 </ul>
 
@@ -44,6 +42,7 @@
                     </a>
                     <div class="dropdown-menu" aria-labelledby="navbarAbout">
                         <a class="nav-link" href="{% url 'profil_list' %}"> Les coopérateurs</a>
+                        <a class="nav-link" href="{% url 'haystack_search' %}"> Chercher...</a>
                         <a class="nav-link" href="{% url 'contact' %}"> Contact </a>
                         <a class="nav-link" href="{% url 'charte' %}"> Charte </a>
                         <a class="nav-link" href="{% url 'fairedon' %}"> Faire un don</a>
