@@ -1,0 +1,43 @@
+{% extends 'base.html' %}
+
+{% block subtitle %}
+Votre panier (id: {{panier.id}}), créé le {{panier.date_creation}}
+{% endblock %}
+{% block content %}
+<div class="row">
+    <div class="col-md-12">
+    <table class="table table-condensed tablepanier table-striped">
+        <thead class="thead-inverse">
+            <tr>
+                <th>Produit</th>
+                <th>Producteur</th>
+                <th>Quantité</th>
+                <th>Prix unitaire</th>
+                <th>Monnaie</th>
+                <th>Total </th>
+            </tr>
+        </thead>
+        <tbody>
+    {% for item in items %}
+    <tr>
+        <td><a href="{{item.produit.get_absolute_url}}">{{ item.produit.nom_produit }}</a></td>
+        <td><a href="{% url 'profil' item.produit.user.user.id %}">{{ item.produit.user.user.username }}</a></td>
+        <td>{{ item.quantite }} {{ item.produit.get_type_prix }}</td>
+        <td>{{ item.produit.get_prix }}</td>
+        <td>{{ item.produit.get_unite_prix }} </td>
+        <td class="table-info">{{ item.total_prix }}</td>
+    </tr>
+    {% endfor %}
+    <tr class="active">
+        <td class="table-success">Total</td>
+        <td class="table-success"></td>
+        <td class="table-success"> {{ panier.total_quantite }}</td>
+        <td class="table-success"></td>
+        <td class="table-success"></td>
+        <td class="table-success">{{ panier.total_prix }}</td>
+    </tr>
+        </tbody>
+    </table>
+    </div>
+    </div>
+{% endblock %}

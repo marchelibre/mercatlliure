@@ -1,0 +1,146 @@
+{% extends 'base.html' %}
+{% load app_filters %}
+{% block title %} {{ produit.proprietes.nom_produit }} {% endblock %}
+[%comment%}
+<style>.body{background: {{ produit.couleur }};}</style>
+{% block subtitle %}
+<div class="textcenter">
+<a class="infos">Offre proposée par </a>
+{%if produit.user.id|is_numeric%}
+<a class="infos" href="{% url 'profil' produit.user.id %}">{{produit.user.user.username}}</a><a class="infos">, le {{ produit.date_creation }}</a>
+{%else%}
+<a class="infos" href="{% url 'profil_inconnu' %}">un producteur disparu !</a><a class="infos">, le {{ produit.date_creation }}</a>
+{% endif %}
+	</div>
+{% endblock %}
+[%endcomment%}
+
+{% block content %}
+<style>.soustitre{
+	background-color: {{ produit.couleur }};}
+</style>
+
+<script>
+  	function ajouterAuPanier() {
+    	var quantite = parseInt($('#quantite').val());
+     location.href="/panier/ajouter/" + {{produit.id}} + "/" + $('#quantite').val()
+  }
+</script>
+<div class="d-flex justify-content-center">
+	<nav class="breadcrumb">
+	  <a class="breadcrumb-item glyphicon-chevron-right" href="{% url 'produit_lister' %}">Au marché</a>
+	  <a class="breadcrumb-item" href="/produits/lister/?categorie={{produit.categorie}}" categorie=produit.categorie %}">{{produit.categorie}}</a>
+	  <a class="breadcrumb-item" href="/produits/lister/?souscategorie={{produit.souscategorie}}" souscategorie=produit.souscategorie %}">{{produit.souscategorie}}</a>
+	  <a class="breadcrumb-item" href="/produits/lister/?producteur={{produit.user.user.username}}">{{produit.user.user.username}}</a>
+
+	  <span class="breadcrumb-item active">{% if produit.estUneOffre%}Offre : {%else%} Recherche : {%endif%}</span>
+	</nav>
+</div>
+<div class="row";>
+	<div class="col-md-8 paddingbase detailProduit" style="background-color: {{ produit.couleur }}; min-height:200px !important">
+		<div class="row "  >
+			<div class="col-md-6 ">
+			{% if produit.photo %}
+			<div class="col-sm-8"> <img alt="{{produit.nom_produit}}" src="{{ produit.photo.url }}" class="img-responsive"/></div>
+			{% else%}
+			<div class="col-sm-8">aucune photo</div>
+			{% endif%}
+				{%comment%}<img alt="Bootstrap Image Preview" src="http://lorempixel.com/140/140/" />{%endcomment%}
+			</div>
+			<div class="col-md-6">
+				<h3>
+					{{produit.nom_produit}}
+				</h3>
+				<p>
+					{{produit.description}}
+				</p>
+				<p class="infos">
+			{% if produit.date_debut %}à partir du: {{ produit.date_debut }}{% endif%} {% if produit.date_expiration %} jusqu'au {{ produit.date_expiration }}{% endif%}</p>
+			</div>
+		</div>
+	</div>
+	{% if user.id != produit.user.user.id and produit.estUneOffre%}
+	<div class="col-md-4 paddingbase">
+		<div class=row">
+			Quantité demandée :
+			<div class="input-group">
+				<span class="input-group-btn">
+					<button type="button" class="quantite-left-minus btn btn-danger btn-number"  data-type="minus" data-field="">
+					  <span class="glyphicon glyphicon-minus"></span>
+					</button>
+				</span>
+				<input type="text" id="quantite" name="quantite" class="form-control input-number" value="1" min="0" >
+				<span class="input-group-btn">
+					<button type="button" class="quantite-right-plus btn btn-success btn-number" data-type="plus" data-field="">
+						<span class="glyphicon glyphicon-plus"></span>
+					</button>
+				</span>
+			</div></br>
+		<a onclick="ajouterAuPanier()" class="btn btn-primary btn-lg btn-block " type="button" id="buttonAjouterAuPanier">
+			Ajouter au panier</a></br>
+		<a href="{%url 'produit_contacterProducteur' produit.id %}" class="btn btn-success btn-block  btn-lg" type="button">Contacter le producteur</a>
+		</div>
+	</div>
+	{%else%}
+	<div class="col-md-4 paddingbase">
+
+		<a href="{%url 'produit_modifier' produit.id %}" class="btn btn-warning btn-lg btn-block" type="button">
+			Modifier l'offre</a>
+		<a href="{%url 'produit_supprimer' produit.id %}" class="btn btn-danger btn-lg btn-block" type="button">
+			Supprimer l'offre</a>
+	</div>
+	{%endif%}
+</div>
+<div class="row">
+	<div class="col-md-8">
+	<table class="table table-condensed tablecustom">
+		{%comment%}
+		<thead>
+			<tr>
+				<th>
+					#
+				</th>
+				<th>
+
+				</th>
+			</tr>
+		</thead>
+		{%endcomment%}
+		<tbody>
+			<tr class="active">
+				<td>
+					Catégorie :
+				</td>
+				<td>
+					{{ produit.souscategorie }}
+				</td>
+			</tr>
+			<tr class="active">
+				<td>
+					Etat/niveau
+				</td>
+				<td>
+					{{ produit.etat }}
+				</td>
+			</tr>
+			<tr class="active">
+				<td>
+					Prix:
+				</td>
+				<td>
+					{{ produit.get_prixEtUnite }}
+				</td>
+			</tr>
+			<tr class="active">
+				<td>
+					Stock :
+				</td>
+				<td>
+					{{ produit.stock_initial}}
+				</td>
+			</tr>
+		</tbody>
+	</table>
+</div>
+
+{% endblock %}

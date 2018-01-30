@@ -8,7 +8,7 @@ from django.views.generic import ListView
 
 def accueil(request):
     """ Afficher tous les articles de notre blog """
-    articles = Article.objects.all()  # Nous sélectionnons tous nos articles
+    articles = Article.objects.all().order_by('-date')  # Nous sélectionnons tous nos articles
     return render(request, 'blog/accueil.html', {'derniers_articles': articles})
 
 
@@ -23,16 +23,16 @@ def ajouterNouveauPost(request):
             return render(request, 'blog/lireArticle.html', {'article': article})
         return render(request, 'blog/ajouterPost.html', { "form": form, })
 
-    
-    
+
+
 # def index(request):
 #     all_posts = Post.objects.all().order_by('-date')
 #     template_data = {'posts' : all_posts}
-#  
+#
 #     return render_to_response('index.html', template_data)
 
 # def lire(request,slug):
-#     
+#
 #     article = get_object_or_404(Article, slug=slug)
 #     return render(request, 'blog/lire.html', {'article':article})
 
@@ -48,20 +48,40 @@ def lireArticle(request, slug):
     if form.is_valid():
         comment = form.save(commit=False)
         comment.article = article
+        comment.auteur = request.user
         comment.save()
-        request.session["nom"] = comment.nom
-        request.session["email"] = comment.email
-        request.session["siteweb"] = comment.siteweb
         return redirect(request.path)
-    
-    form.initial['nom'] = request.session.get('nom')
-    form.initial['email'] = request.session.get('email')
-    form.initial['siteweb'] = request.session.get('siteweb')
-    return render(request, 'blog/lireArticle.html', { 'article': article, 'form': form, 'commentaires':commentaires},)
+
+    return render(request, 'blog/lireArticle.html', {'article': article, 'form': form, 'commentaires':commentaires},)
 
 
 class ListeArticles(ListView):
     model = Article
-    context_object_name = "derniers_articles"
-    template_name = "blog/accueil.html"
-    paginate_by = 5
+    context_object_name = "article_list"
+    template_name = "blog/index.html"
+    paginate_by = 10
+
+    def get_queryset(self):
+        qs = Article.objects.all()
+        params = dict(self.request.GET.items())
+
+        if "auteur" in params:
+            qs = qs.filter(auteur__user__username=params['auteur'])
+        if "categorie" in params:
+            qs = qs.filter(categorie=params['categorie'])
+
+        return qs.order_by('categorie', '-date', 'auteur')
+
+    def get_context_data(self, **kwargs):
+        # Call the base implementation first to get a context
+        context = super().get_context_data(**kwargs)
+
+        # context['producteur_list'] = Profil.objects.values_list('user__username', flat=True).distinct()
+        context['auteur_list'] = Article.objects.order_by('auteur').values_list('auteur__user__username', flat=True).distinct()
+        context['categorie_list'] = Article.objects.order_by('categorie').values_list('categorie', flat=True).distinct()
+        context['typeFiltre'] = "aucun"
+        if 'auteur' in self.request.GET:
+            context['typeFiltre'] = "auteur"
+        if 'categorie' in self.request.GET:
+            context['typeFiltre'] = "categorie"
+        return context

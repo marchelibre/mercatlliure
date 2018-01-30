@@ -42,14 +42,24 @@ INSTALLED_APPS = (
     'django.contrib.staticfiles',
     'django.contrib.admindocs',
     'django.contrib.sites',
+    #'django.contrib.gis',
+    'bootstrap','fontawesome',
+    'haystack',
     'debug_toolbar',
     'model_utils',
-    'address',
+    #'address',
     'bourseLibre',
     'blog',
     'django_extensions',
-    'sitetree',
-    'panier',
+    'django_filters',
+    'rest_framework',
+    'leaflet'
+    #"geoposition",
+    #"geodjango",
+    #'osm_field',
+    #'location_field.apps.DefaultConfig',
+    #'sitetree',
+    #'panier',
     #'location-field',
     #'polymorphic',  # We need polymorphic installed for the shop
     #'shop',  # The django SHOP application
@@ -57,18 +67,30 @@ INSTALLED_APPS = (
     # 'regist#ration'
 )
 
-MIDDLEWARE_CLASSES = (
+# MIDDLEWARE_CLASSES = (
+#     'django.contrib.sessions.middleware.SessionMiddleware',
+#     'django.middleware.common.CommonMiddleware',
+#     'django.middleware.csrf.CsrfViewMiddleware',
+#     'django.contrib.auth.middleware.AuthenticationMiddleware',
+#     'django.contrib.auth.middleware.SessionAuthenticationMiddleware',
+#     'django.contrib.messages.middleware.MessageMiddleware',
+#     'django.middleware.common.BrokenLinkEmailsMiddleware',
+#     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+#     'django.middleware.security.SecurityMiddleware',
+#    # 'debug_toolbar.middleware.DebugToolbarMiddleware',
+# )
+
+MIDDLEWARE = [
+    'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
-    'django.contrib.auth.middleware.SessionAuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
-    'django.middleware.common.BrokenLinkEmailsMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
-    'django.middleware.security.SecurityMiddleware',
-    'debug_toolbar.middleware.DebugToolbarMiddleware',
-)
+   'debug_toolbar.middleware.DebugToolbarMiddleware',
+]
+
 
 ROOT_URLCONF = 'bourseLibre.urls'
 
@@ -103,11 +125,26 @@ DATABASES = {
 }
 
 AUTH_PASSWORD_VALIDATORS = [
-    {'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator', },
+    #{'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator', },
     # {    'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator',},
-    {'NAME': 'django.contrib.auth.password_validation.CommonPasswordValidator', },
-    {'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator', },
+    #{'NAME': 'django.contrib.auth.password_validation.CommonPasswordValidator', },
+    #{'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator', },
 ]
+#AUTH_USER_MODEL = 'bourseLibre.Profil'
+
+# HAYSTACK_CONNECTIONS = {
+#     'default': {
+#         'ENGINE': 'haystack.backends.elasticsearch2_backend.Elasticsearch2SearchEngine',
+#         'URL': 'http://127.0.0.1:8000/',
+#         'INDEX_NAME': 'haystack',
+#     },
+# }y
+HAYSTACK_CONNECTIONS = {
+    'default': {
+        'ENGINE': 'haystack.backends.whoosh_backend.WhooshEngine',
+        'PATH': os.path.join(os.path.dirname(__file__), 'whoosh_index'),
+    },
+}
 # AUTH_USER_MODEL = 'bourseLibre.models.Producteur'
 # Internationalization
 # https://docs.djangoproject.com/en/1.8/topics/i18n/
@@ -125,6 +162,7 @@ USE_L10N = True
 USE_TZ = True
 
 DATE_FORMAT = "d/M/y"
+
 LOGIN_URL = '/login/'
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/1.8/howto/static-files/
@@ -167,9 +205,26 @@ def root(folder):
     return os.path.join(os.path.abspath(os.path.dirname(__file__)), '..', folder)
 
 
-STATIC_ROOT = root('staticstorage')
+# STATIC_ROOT = root('staticstorage')
 STATIC_URL = '/static/'
 # Additional locations of static files
 STATICFILES_DIRS = (
     root('static'),
 )
+
+# LOCATION_FIELD = {
+#     'map.provider': 'openstreetmap',
+# }
+
+#GEOPOSITION_GOOGLE_MAPS_API_KEY = ' AIzaSyCmGcPj0ti_7aEagETrbJyHPbE3U6gVfSA '
+
+#GOOGLE_API_KEY = 'AIzaSyCmGcPj0ti_7aEagETrbJyHPbE3U6gVfSA'
+
+#GOOGLE_API_KEY = 'AIzaSyC10StWuCZHLPmSZCyfNEdmgZ7CTqdngy0'
+
+LEAFLET_CONFIG = {
+'DEFAULT_CENTER': (42.7201813, 2.8876436),
+'DEFAULT_ZOOM': 10,
+'MIN_ZOOM': 3,
+'MAX_ZOOM': 18,
+}

@@ -3,8 +3,12 @@ body {
     #9999ff url("../images/background.png");%url("../images/background.png");*/
     background: #E9E9E9;
     margin: auto;
-    width: 90%;
-    padding: 10px;
+    width: 97%;
+    /*padding: 10px;*/
+    padding-top: 80px;
+    /*font-family: cursive;*/
+    font-family: serif;
+    /*font-family: system-ui;*/
 }
 .textcenter{
     text-align: center;
@@ -25,13 +29,19 @@ ul.errorlist > li {
 .row{
     margin-right: 15px;
     margin-left: 15px;
-    padding: 5px 5px 5px 5px;
+    padding: 5px;
 }
-/*.breadcrumb span, .breadcrumb div {display:inline-block!important; float:left!important}*/
+/*
+.breadcrumb span, .breadcrumb div {display:inline-block!important; float:right!important}*/
+.breadcrumbs{
+    text-align:center;
+}
 .navbar {
     border-radius: 0.4em;
-    border: 3px solid #053200;
-    %margin-bottom: 2em
+    border: 2px solid #053200;
+    box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+    background-color:#4d9900;
+
 }
 
 .navbar-brand {
@@ -39,10 +49,9 @@ ul.errorlist > li {
 }
 
 .contenu{
-    margin-top: 5em;
+    /*margin-top: 2em;*/
     margin-bottom: 2em;
     border-radius: 0.4em;
-    border: 3px solid #053200;
     padding: 10px 10px 10px 10px;
 }
 /*
@@ -59,35 +68,74 @@ ul.errorlist > li {
 }
 
 .soustitre{
-    padding: 7em 2em 7em 2em;
+    padding: 5px;
     border-radius: 0.4em;
     /*rder: 1px solid #053200;*/
-    padding: 10px 10px 10px 10px;
+    border:10px red;
 }
+
 .bodycontenu{
-    padding: 7em 2em 7em 2em;
     padding-bottom: 2em;
-    border-radius: 0.5em;
-    /*border: 1px solid #053200;*/
-    padding: 10px 10px 10px 10px;
+    border-radius: 0.4em;
+    /*border: 0.5px solid #053200;*/
+    padding: 10px ;
 }
+.bodycontenucomplet{
+    padding: 10px ;
+    border-radius: 0.4em;
+    box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+    min-height: 500px;
+    border: 0.5px solid #053200;
+    }
 
-
+#parent {
+    text-align:center;
+    background-color:blue;
+    height:400px;
+    width:600px;
+}
+.block {
+    height:100px;
+    width:200px;
+    text-align:left;
+}
+.center {
+    margin:auto;
+    background-color:green;
+}
+.left {
+    margin:auto auto auto 0;
+    background-color:red;
+}
+.right {
+    margin:auto 0 auto auto;
+    background-color:yellow;
+}
 .infos{
     font-size:small;
 }
 
 .col_cat{
-    border-radius: 1em;
-    padding: 10px 15px 10px 15px;
+    padding: 25px;
+    margin:5px;
+    border:1px ;
+    width:400px;
+    border:2px grey solid;
+    border-radius: 0.4em;
+    flex:1 1 auto;
+    box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
 }
 .col_cat a:link, a:visited {
     color: black;
+    text-decoration: none;
 }
-.extratest:hover{
-opacity: 0.7;
+
+.col_cat:hover{
+    opacity:0.85;
+    border-radius: 1em;
+    box-shadow: 0 10px 10px 0px grey;
+    text-decoration: none;
 }
-/*
 .col_aliment{
    /* border-left: 6px solid #CEECF5;*/
     color: black;/*#6666ff*/
@@ -111,11 +159,73 @@ opacity: 0.7;
 .tablecustom{
     background-color:grey;
 }
-.offre{
-    padding-bottom:10px;
-    border-radius: 0.8em;
+
+.tablepanier{
+    background-color:#87ceeb;
 }
-.offre:hover{
-opacity:0.85;
+.tableprofils{
+    background-color: #ffffcc;
+}
+
+.offre_entree{
+    padding-bottom:5px;
+    border-radius: 0.3em;
+    align-items: top;
+    margin:5px;  /* and that, will result in a 10px gap */
+    border:1px red solid;
+}
+.offre_entree:hover{
+    opacity:0.85;
     border-radius: 1em;
+    box-shadow: 0 10px 10px 0px grey;
+}
+.offre{
+    padding-bottom:5px;
+    align-items: top;
+    height: 250px;
+    width:300px;
+    border-radius: 0.3em;
+    border:1px grey solid;
+    flex:1 1 auto;
+    text-align:center;
+    margin:5px;  /* and that, will result in a 10px gap */
+}
+
+.offre:hover{
+    opacity:0.85;
+    border-radius: 1em;
+    box-shadow: 0 10px 10px 0px grey;
+    text-decoration: none;
+}
+
+.listOffres{
+    display: flex ;
+    flex-flow: row wrap;
+    justify-content: center;
+    display: -webkit-box;
+	display: -webkit-flex;
+	display: -moz-box;
+	display: -ms-flexbox;
+	display: flex;
+    padding:5px;
+}
+
+.detailProduit{
+    box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+}
+
+.article{
+//background-color: grey;
+border-color: #333;
+box-shadow: 0 10px 10px 0px grey;
+ padding:15px;
+    min-height: 150px;
+    border-radius: 0.3em;
+    border:1.5px grey solid;
+}
+.commentaire{
+    border-color: #333;=
+    padding:10px;
+    min-height: 100px;
+    border-radius: 0.3em;
 }

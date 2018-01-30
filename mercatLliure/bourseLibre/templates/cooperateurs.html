@@ -1,0 +1,33 @@
+{% extends 'base.html' %}
+
+{% block subtitle %}
+Les coopérateurs :
+{% endblock %}
+{% block content %}
+<div class="row">
+    <div class="col-md-12">
+    <table class="table table-condensed tableprofils table-striped">
+        <thead class="thead-inverse">
+            <tr>
+                <th>Avatar</th>
+                <th>Pseudo</th>
+                <th>Email</th>
+                <th>Code postal</th>
+            </tr>
+        </thead>
+        <tbody>
+        {% for user in users %}
+        <tr>
+            <td>
+                <img src="{{ user.avatar.get_absolute_url }}" alt="pas d'image" style="width:100px;height:100px" href="{% url 'profil' user.id %}">
+            </td>
+            <td><a href="{% url 'profil' user.id %}">{{ user.user.username }}</a></td>
+            <td><a href="{% url 'profil_contact' user.id %}">{{ user.user.email }}</a></td>
+            <td><a href="{% url 'profil' user.id %}">{{ user.adresse.code_postal }}</a></td>
+        </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+    </div>
+    </div>
+{% endblock %}
