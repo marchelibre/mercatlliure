@@ -20,7 +20,7 @@ from django.contrib.auth.models import User
 class Article(models.Model):
     categorie = models.CharField(max_length=30,         
         choices=(('Jardinage','Jardinage'), ('Recette', 'Recette'), ('Histoire', 'Histoire'), ('Bricolage','Bricolage'), ('Culture','Culture'), ('Bon_plan', 'Bon plan'), ('Point', 'Point de vue'), ('autre','autre'),),
-        default='Histoire', verbose_name="categorie")
+        default='Jardinage', verbose_name="categorie")
     titre = models.CharField(max_length=100)
     auteur = models.ForeignKey(Profil, on_delete=models.CASCADE)
     slug = models.SlugField(max_length=100)

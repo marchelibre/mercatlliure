@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 from django.db import models
-from django.contrib.auth.models import User, AbstractUser
-from django.utils import timezone
+from django.contrib.auth.models import User#, AbstractUser
+#from django.utils import timezone
 from django.db.models.signals import post_save
 from django.dispatch import receiver
 from django.core.validators import MinValueValidator
@@ -11,7 +11,9 @@ from django.utils.timezone import now
 import datetime
 from model_utils.managers import InheritanceManager
 import django_filters
-from django.urls import reverse
+from django.urls import reverse, reverse_lazy
+
+from django.template.defaultfilters import slugify
 
 from django.utils.translation import ugettext_lazy as _
 #from django.contrib.contenttypes.models import ContentType
@@ -27,7 +29,7 @@ import requests
 
 #from django.contrib.gis.db.models import GeoManager
 
-class ChoixProduits():
+class Choix():
     #couleurs = {'aliment':'#D8C457','vegetal':'#4CAF47','service':'#BE373A','objet':'#5B4694'}
     couleurs = {'aliment':'#D8AD57','vegetal':'#A9CB52','service':'#E66562','objet':'#80B2C0'}
     typePrixUnite =  (('kg', 'kg'), ('100g', '100g'), ('10g', '10g'),('g', 'g'),  ('un', 'unité'), ('li', 'litre'))
@@ -52,11 +54,13 @@ class ChoixProduits():
         'souscategorie': ('materiel','vehicule', 'multimedia', 'mobilier','autre'),
         'etat': (('excellent', 'excellent'), ('bon', 'bon'), ('moyen', 'moyen'), ('mauvais', 'mauvais')),
         'type_prix': typePrixUnite,
-    }
+    },
+    'monnaies': (('don', 'don'), ('soudaqui', 'soudaqui'), ('heuresT', 'heuresT'), ('troc', 'troc')),
+
     }
 
 def get_categorie_from_subcat(subcat):
-    for typeProduit, dico in ChoixProduits.choix.items():
+    for typeProduit, dico in Choix.choix.items():
         if subcat in dico['souscategorie']:
             return typeProduit
     return "Categorie inconnue (souscategorie : " + str(subcat) +")"
@@ -71,12 +75,14 @@ class Adresse(models.Model):
     longitude = models.FloatField(blank=True, null=True, default=LONGITUDE_DEFAUT)
     pays = models.CharField(max_length=12, blank=True, null=True, default="France")
     telephone = models.FloatField(blank=True, null=True)
-    slug = models.SlugField(max_length=100)
 
     def save(self, *args, **kwargs):
         ''' On save, update timestamps '''
         self.set_latlon_from_adresse()
         return super(Adresse, self).save(*args, **kwargs)
+
+    def get_absolute_url(self):
+        return reverse_lazy('profil_courant')
 
     def set_latlon_from_adresse(self):
         address = ''
@@ -115,7 +121,6 @@ class Profil(models.Model):
     avatar = models.ImageField(null=True, blank=True, upload_to="avatars/", default='avatar/avatar-defaut2.jpg')
     inscrit_newsletter = models.BooleanField(default=False)
     date_registration = models.DateTimeField(verbose_name="Date de création", editable=False)
-    slug = models.SlugField(max_length=100)
 
     # position = models_gis.PointField()
     # code_postal = models_gis.CharField(max_length=5)
@@ -141,7 +146,7 @@ class Profil(models.Model):
         return "Profil"
 
     def get_absolute_url(self):
-        return reverse('profil', kwargs={'user_id':self.id})
+        return reverse('profil_courant')#, kwargs={'user_id':self.id})
 #
 @receiver(post_save, sender=User)
 def create_user_profile(sender, instance, created, **kwargs):
@@ -157,15 +162,12 @@ def create_user_profile(sender, instance, created, **kwargs):
 
 
 
-#from polymorphic.models import PolymorphicModel
-from django.template.defaultfilters import slugify
-# from shop.models import BaseProduct
 class Produit(models.Model):  # , BaseProduct):
     user = models.ForeignKey(Profil, on_delete=models.CASCADE,)
     date_creation = models.DateTimeField(verbose_name="Date de parution", editable=False)
-    date_debut = models.DateField(default=now, verbose_name="Date de debut")
+    date_debut = models.DateField(default=now, verbose_name="Débute le : (jj/mm/an)", null=True, blank=True)
     proposed_renewal_date = datetime.date.today() + datetime.timedelta(weeks=3)
-    date_expiration = models.DateField(verbose_name='date_expiration', default=proposed_renewal_date, )
+    date_expiration = models.DateField(verbose_name="Expire le : (jj/mm/an)", blank=True, null=True, default=proposed_renewal_date, )
     nom_produit = models.CharField(max_length=250)
     description = models.TextField(blank=True, null=True)
     slug = models.SlugField(max_length=100)
@@ -176,7 +178,7 @@ class Produit(models.Model):  # , BaseProduct):
     prix = models.DecimalField(max_digits=4, decimal_places=2, default=1, validators=[MinValueValidator(0), ])
     unite_prix = models.CharField(
         max_length=8,
-        choices=(('don', 'don'),('soudaqui', 'soudaqui'), ('eugros', 'eugros'), ('heures', 'heures'), ('troc', 'troc')),
+        choices = Choix.choix['monnaies'],
         default='lliure', verbose_name="monnaie"
     )
 
@@ -187,7 +189,7 @@ class Produit(models.Model):  # , BaseProduct):
     photo = models.ImageField(blank=True, upload_to="imagesProduits/")
 
 
-    estUneOffre = models.BooleanField(default=True)
+    estUneOffre = models.BooleanField(default=True, verbose_name='Offre ? (ou demande)')
 
     objects = InheritanceManager()
 
@@ -246,23 +248,23 @@ class Produit_aliment(Produit):  # , BaseProduct):
     type = 'aliment'
     couleur = models.CharField(
         max_length=20,
-        choices=((ChoixProduits.couleurs['aliment'],ChoixProduits.couleurs['aliment']),),
-        default=ChoixProduits.couleurs['aliment']
+        choices=((Choix.couleurs['aliment'], Choix.couleurs['aliment']),),
+        default=Choix.couleurs['aliment']
     )
     souscategorie = models.CharField(
         max_length=20,
-        choices=((cat,cat) for cat in ChoixProduits.choix[type]['souscategorie']),
-        default=ChoixProduits.choix[type]['souscategorie'][0][0]
+        choices=((cat,cat) for cat in Choix.choix[type]['souscategorie']),
+        default=Choix.choix[type]['souscategorie'][0][0]
     )
     etat = models.CharField(
         max_length=20,
-        choices=ChoixProduits.choix[type]['etat'],
-        default=ChoixProduits.choix[type]['etat'][0][0]
+        choices=Choix.choix[type]['etat'],
+        default=Choix.choix[type]['etat'][0][0]
     )
     type_prix = models.CharField(
         max_length=20,
-        choices=ChoixProduits.choix[type]['type_prix'],
-        default=ChoixProduits.choix[type]['type_prix'][0][0], verbose_name="par"
+        choices=Choix.choix[type]['type_prix'],
+        default=Choix.choix[type]['type_prix'][0][0], verbose_name="par"
     )
     def get_unite_prix(self):
         if self.unite_prix == "don":
@@ -282,23 +284,23 @@ class Produit_vegetal(Produit):  # , BaseProduct):
     type = 'vegetal'
     couleur = models.CharField(
         max_length=20,
-        choices=((ChoixProduits.couleurs['vegetal'],ChoixProduits.couleurs['vegetal']),),
-        default=ChoixProduits.couleurs['vegetal']
+        choices=((Choix.couleurs['vegetal'], Choix.couleurs['vegetal']),),
+        default=Choix.couleurs['vegetal']
     )
     souscategorie = models.CharField(
         max_length=20,
-        choices=((cat,cat) for cat in ChoixProduits.choix[type]['souscategorie']),
-        default=ChoixProduits.choix[type]['souscategorie'][0][0]
+        choices=((cat,cat) for cat in Choix.choix[type]['souscategorie']),
+        default=Choix.choix[type]['souscategorie'][0][0]
     )
     etat = models.CharField(
         max_length=20,
-        choices=ChoixProduits.choix[type]['etat'],
-        default=ChoixProduits.choix[type]['etat'][0][0]
+        choices=Choix.choix[type]['etat'],
+        default=Choix.choix[type]['etat'][0][0]
     )
     type_prix = models.CharField(
         max_length=20,
-        choices=ChoixProduits.choix[type]['type_prix'],
-        default=ChoixProduits.choix[type]['type_prix'][0][0], verbose_name="par"
+        choices=Choix.choix[type]['type_prix'],
+        default=Choix.choix[type]['type_prix'][0][0], verbose_name="par"
     )
     def get_unite_prix(self):
         if self.unite_prix == "don":
@@ -318,23 +320,23 @@ class Produit_service(Produit):  # , BaseProduct):
     type = 'service'
     couleur = models.CharField(
         max_length=20,
-        choices=((ChoixProduits.couleurs['service'],ChoixProduits.couleurs['service']),),
-        default=ChoixProduits.couleurs['service']
+        choices=((Choix.couleurs['service'], Choix.couleurs['service']),),
+        default=Choix.couleurs['service']
     )
     souscategorie = models.CharField(
         max_length=20,
-        choices=((cat,cat) for cat in ChoixProduits.choix[type]['souscategorie']),
-        default=ChoixProduits.choix["service"]['souscategorie'][0][0]
+        choices=((cat,cat) for cat in Choix.choix[type]['souscategorie']),
+        default=Choix.choix["service"]['souscategorie'][0][0]
     )
     etat = models.CharField(
         max_length=20,
-        choices=ChoixProduits.choix["service"]['etat'],
-        default=ChoixProduits.choix["service"]['etat'][0][0]
+        choices=Choix.choix["service"]['etat'],
+        default=Choix.choix["service"]['etat'][0][0]
     )
     type_prix = models.CharField(
         max_length=20,
-        choices=ChoixProduits.choix["service"]['type_prix'],
-        default=ChoixProduits.choix["service"]['type_prix'][0][0], verbose_name="par"
+        choices=Choix.choix["service"]['type_prix'],
+        default=Choix.choix["service"]['type_prix'][0][0], verbose_name="par"
     )
     def get_unite_prix(self):
         if self.unite_prix == "don":
@@ -354,23 +356,23 @@ class Produit_objet(Produit):  # , BaseProduct):
     type = 'objet'
     couleur = models.CharField(
         max_length=20,
-        choices=((ChoixProduits.couleurs['objet'],ChoixProduits.couleurs['objet']),),
-        default=ChoixProduits.couleurs['objet']
+        choices=((Choix.couleurs['objet'], Choix.couleurs['objet']),),
+        default=Choix.couleurs['objet']
     )
     souscategorie = models.CharField(
         max_length=20,
-        choices=((cat,cat) for cat in ChoixProduits.choix[type]['souscategorie']),
-        default=ChoixProduits.choix[type]['souscategorie'][0][0]
+        choices=((cat,cat) for cat in Choix.choix[type]['souscategorie']),
+        default=Choix.choix[type]['souscategorie'][0][0]
     )
     etat = models.CharField(
         max_length=20,
-        choices=ChoixProduits.choix[type]['etat'],
-        default=ChoixProduits.choix[type]['etat'][0][0]
+        choices=Choix.choix[type]['etat'],
+        default=Choix.choix[type]['etat'][0][0]
     )
     type_prix = models.CharField(
         max_length=20,
-        choices=ChoixProduits.choix[type]['type_prix'],
-        default=ChoixProduits.choix[type]['type_prix'][0][0], verbose_name="par"
+        choices=Choix.choix[type]['type_prix'],
+        default=Choix.choix[type]['type_prix'][0][0], verbose_name="par"
     )
     def get_unite_prix(self):
         if self.unite_prix == "don":

@@ -31,8 +31,8 @@ from .models import Produit, Produit_aliment, Produit_objet, Produit_service, Pr
 #     even_field = forms.IntegerField(validators=[validate_even])
 
 
-fieldsCommunsProduits = ['souscategorie', 'photo', 'nom_produit', 'etat',   'description', 'date_debut', 'date_expiration',
-                'unite_prix', 'prix',  'type_prix', 'stock_initial',]
+fieldsCommunsProduits = ['souscategorie', 'photo', 'nom_produit', 'etat',   'description', 'estUneOffre',
+                'prix',  'unite_prix', 'type_prix', 'date_debut', 'date_expiration', 'stock_initial',]
 
 # fieldsCommunsProduits = ['type_prix', 'souscategorie', 'etat']
 #
@@ -114,7 +114,7 @@ class ProduitCreationForm(forms.ModelForm):
 class Produit_aliment_CreationForm(forms.ModelForm):
     class Meta:
         model = Produit_aliment
-        fields =fieldsCommunsProduits
+        fields = fieldsCommunsProduits
         #exclude = ('proprietes',)
         #fields ='__all__'
         widgets = {
@@ -133,7 +133,6 @@ class Produit_vegetal_CreationForm(forms.ModelForm):
         }
         #fields ='__all__'
        # exclude = ('proprietes',)
-
 class Produit_service_CreationForm(forms.ModelForm):
     class Meta:
         model = Produit_service
@@ -170,42 +169,33 @@ class AdresseForm(forms.ModelForm):
 
     class Meta:
         model = Adresse
-        fields = '__all__'
-        exclude = ('latitude', 'longitude')
-    # def save(self, *args, **kwargs):
-    #     import requests
-    #
-    #     address = self.cleaned_data['rue'] + ", "+ self.cleaned_data['code_postal']
-    #     api_key = "AIzaSyCmGcPj0ti_7aEagETrbJyHPbE3U6gVfSA"
-    #     api_response = requests.get(
-    #         'https://maps.googleapis.com/maps/api/geocode/json?address={0}&key={1}'.format(address, api_key))
-    #     api_response_dict = api_response.json()
-    #
-    #     if api_response_dict['status'] == 'OK':
-    #         self.latitude = api_response_dict['results'][0]['geometry']['location']['lat']
-    #         self.longitude = api_response_dict['results'][0]['geometry']['location']['lng']
-    #     return super(AdresseForm, self).save(*args, **kwargs)
+        #fields = '__all__'
+        exclude = ('latitude', 'longitude', 'slug')
+
+    def save(self, *args, **kwargs):
+        adresse = super(AdresseForm, self).save(commit=False)
+        adresse.set_latlon_from_adresse()
+        adresse.save()
+        return adresse
 
 class ProfilCreationForm(forms.ModelForm):
     class Meta:
         model = Profil
-        exclude = ['user', 'adresse']
+        exclude = ['user', 'adresse', 'slug']
 
-    # def save(self, user, adresse):
-    #     profil = super(ProfilCreationForm, self).save(commit=False)
-    #     profil.user = user
-    #     profil.adresse = adresse
-    #     profil.save()
-    #     return profil
+    def save(self):
+        profil = super(ProfilCreationForm, self).save()
+        return profil
 
 
 class ProducteurCreationForm(UserCreationForm):
     email = forms.EmailField(label="Email", required=False)
     username = forms.CharField(label="pseudonyme")
+    name = forms.CharField(label="Nom complet")
 
     class Meta:
         model = User
-        fields = ['username', 'email', 'password1', 'password2',
+        fields = ['name', 'username', 'email', 'password1', 'password2',
                 #  'competences', 'rue', 'code_postal', 'latitude', 'longitude', 'pays', 'telephone'
                   ]
     #

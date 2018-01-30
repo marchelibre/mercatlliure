@@ -28,11 +28,12 @@
 </script>
 <div class="d-flex justify-content-center">
 	<nav class="breadcrumb">
-	  <a class="breadcrumb-item" href="{% url 'produit_lister' %}">Au marché</a>
+	  <a class="breadcrumb-item glyphicon-chevron-right" href="{% url 'produit_lister' %}">Au marché</a>
 	  <a class="breadcrumb-item" href="/produits/lister/?categorie={{produit.categorie}}" categorie=produit.categorie %}">{{produit.categorie}}</a>
 	  <a class="breadcrumb-item" href="/produits/lister/?souscategorie={{produit.souscategorie}}" souscategorie=produit.souscategorie %}">{{produit.souscategorie}}</a>
 	  <a class="breadcrumb-item" href="/produits/lister/?producteur={{produit.user.user.username}}">{{produit.user.user.username}}</a>
-	  <span class="breadcrumb-item active">{{produit.nom_produit}}</span>
+
+	  <span class="breadcrumb-item active">{% if produit.estUneOffre%}Offre : {%else%} Recherche : {%endif%}</span>
 	</nav>
 </div>
 <div class="row";>
@@ -53,11 +54,12 @@
 				<p>
 					{{produit.description}}
 				</p>
-				<p>Du {{ produit.date_debut }} au {{ produit.date_expiration }}</p>
+				<p class="infos">
+			{% if produit.date_debut %}à partir du: {{ produit.date_debut }}{% endif%} {% if produit.date_expiration %} jusqu'au {{ produit.date_expiration }}{% endif%}</p>
 			</div>
 		</div>
 	</div>
-	{% if user.id != produit.user.user.id%}
+	{% if user.id != produit.user.user.id and produit.estUneOffre%}
 	<div class="col-md-4 paddingbase">
 		<div class=row">
 			Quantité demandée :

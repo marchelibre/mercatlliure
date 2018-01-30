@@ -11,15 +11,7 @@
 {% block subtitle %}
 <div class="row">
   <div class="col-md-8">
-    <p> Profil de {{ user.username }}
-      {%if request.user.id == user.id %}
-        <a href="{% url 'profil_modifier' %}">
-            <button type="button" class="btn btn-sm btn-warning">
-                <span class="glyphicon glyphicon-plus"></span>&nbsp;Modifier le profil
-            </button>
-        </a>
-      {%endif%}
-    </p>
+    <p> Profil de {{ user.username }}    </p>
 
   </div>
     <div class="col-md-4 textright">
@@ -38,9 +30,20 @@
 
 <div class="row">
   <div class="col-md-6">
-    <table class="table table-condensed tablepanier table-striped">
-        <tbody>
 
+      {%if request.user.id == user.id %}
+        <a href="{% url 'profil_modifier_user' %}">
+            <button type="button" class="btn btn-sm btn-warning">
+                <span class="glyphicon glyphicon-plus"></span>&nbsp;Modifier
+            </button>
+        </a>
+      {%endif%}
+      <table class="table table-condensed tablepanier table-striped"><tbody>
+
+    <tr>
+        <td>Date d'adhésion :</td>
+        <td>{{ user.profil.date_registration }}</td>
+    </tr>
     <tr>
         <td>Pseudo :</td>
         <td>{{ user.username }}</td>
@@ -51,11 +54,6 @@
         <td>{{ user.get_full_name }}</td>
     </tr>
   {% endif %}
-
-    <tr>
-        <td></td>
-        <td>{{ user.profil.description }}</td>
-    </tr>
 
   {% if user.profil.avatar %}
     <tr>
@@ -70,14 +68,40 @@
         <td> {{ user.profil.site_web }}</td>
     </tr>
   {% endif %}
+        </tbody>
+    </table>
+
+
+
+      {%if request.user.id == user.id %}
+        <a href="{% url 'profil_modifier' %}">
+            <button type="button" class="btn btn-sm btn-warning">
+                <span class="glyphicon glyphicon-plus"></span>&nbsp;Modifier
+            </button>
+        </a>
+      {%endif%}
+    <table class="table table-condensed tablepanier table-striped"><tbody>
     <tr>
-        <td>Date d'adhésion :</td>
-        <td>{{ user.profil.date_registration }}</td>
+        <td></td>
+        <td>{{ user.profil.description }}</td>
     </tr>
+
     <tr>
         <td>Compétences :</td>
         <td>{{ user.profil.competences }}</td>
     </tr>
+
+        </tbody>
+    </table>
+      {%if request.user.id == user.id %}
+        <a href="{% url 'profil_modifier_adresse' %}">
+            <button type="button" class="btn btn-sm btn-warning">
+                <span class="glyphicon glyphicon-plus"></span>&nbsp;Modifier
+            </button>
+        </a>
+      {%endif%}
+    <table class="table table-condensed tablepanier table-striped">
+        <tbody>
     {%if user.profil.adresse.rue %}
     <tr>
         <td>Adresse :</td>
@@ -106,6 +130,7 @@
         <td>lat/lon :</td>
         <td>{{ user.profil.adresse.latitude }} / {{ user.profil.adresse.longitude }} </td>
     </tr>
+        </tbody>
     </table>
 </div>
 

@@ -77,8 +77,8 @@ class ListeArticles(ListView):
         context = super().get_context_data(**kwargs)
 
         # context['producteur_list'] = Profil.objects.values_list('user__username', flat=True).distinct()
-        context['auteur_list'] = Article.objects.all().values_list('auteur__user__username', flat=True).distinct()
-        context['categorie_list'] = Article.objects.all().values_list('categorie', flat=True).distinct()
+        context['auteur_list'] = Article.objects.order_by('auteur').values_list('auteur__user__username', flat=True).distinct()
+        context['categorie_list'] = Article.objects.order_by('categorie').values_list('categorie', flat=True).distinct()
         context['typeFiltre'] = "aucun"
         if 'auteur' in self.request.GET:
             context['typeFiltre'] = "auteur"

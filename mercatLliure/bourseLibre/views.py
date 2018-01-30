@@ -7,7 +7,7 @@ Created on 25 mai 2017
 from django.shortcuts import render, get_object_or_404, HttpResponseRedirect  # render_to_response,
 from .forms import ProduitCreationForm, Produit_aliment_CreationForm, Produit_vegetal_CreationForm, Produit_objet_CreationForm, \
     Produit_service_CreationForm, ProducteurCreationForm, ContactForm, AdresseForm, ProfilCreationForm
-from .models import Profil, Produit, ChoixProduits, Panier, Item, get_categorie_from_subcat#, ProductFilter#, Produit_aliment, Produit_service, Produit_objet, Produit_vegetal
+from .models import Profil, Produit, Adresse, Choix, Panier, Item, get_categorie_from_subcat#, ProductFilter#, Produit_aliment, Produit_service, Produit_objet, Produit_vegetal
 # from django.db.models import Q
 from django.contrib.auth.models import User
 from django.contrib.auth.forms import UserCreationForm
@@ -18,7 +18,10 @@ from django.core.mail import mail_admins, send_mail
 # from itertools import chain
 from django.db.models import Q
 
+from django import forms
 from django.core.exceptions import ObjectDoesNotExist
+
+#from braces.views import LoginRequiredMixin
 
 
 def bienvenue(request):
@@ -29,13 +32,12 @@ IMAGE_FILE_TYPES = ['png', 'jpg', 'jpeg']
 
 
 @login_required(login_url='/login/')
-def proposerProduit(request, typeProduit):
+def produit_proposer(request, typeProduit):
     try:
-        bgcolor = ChoixProduits.couleurs[typeProduit]
+        bgcolor = Choix.couleurs[typeProduit]
     except:
         bgcolor = None
-
-    #produit_form = ProduitCreationForm(request.POST or None, request.FILES or None)
+    type_form = get_produitForm(request, typeProduit)
     if typeProduit == 'aliment':
         type_form = Produit_aliment_CreationForm(request.POST or None, request.FILES or None)
     elif typeProduit == 'vegetal':
@@ -46,7 +48,6 @@ def proposerProduit(request, typeProduit):
         type_form = Produit_objet_CreationForm(request.POST or None, request.FILES or None)
     else:
         raise Exception('Type de produit inconnu (aliment, vegetal, service ou  objet)')
-    # if produit_form.is_valid() and type_form.is_valid():
     if  type_form.is_valid():
        # produit = produit_form.save(commit=False)
         produit = type_form.save(commit=False)
@@ -76,6 +77,25 @@ class ProduitModifier(UpdateView):
     template_name_suffix = '_modifier'
     fields = ['date_debut','date_expiration','nom_produit', 'description', 'prix', 'unite_prix', 'categorie', 'photo', 'estUneOffre',]# 'souscategorie','etat','type_prix']
 
+    widgets = {
+        'date_debut': forms.DateInput(attrs={'type': "date"}),
+        'date_expiration': forms.DateInput(attrs={'type': "date"})
+    }
+    # field
+
+    def get_form_class(self):
+        if self.object.categorie == 'aliment':
+            return Produit_aliment_CreationForm
+        elif self.object.categorie == 'vegetal':
+            return Produit_vegetal_CreationForm
+        elif self.object.categorie == 'service':
+            return Produit_service_CreationForm
+        elif self.object.categorie == 'objet':
+            return Produit_objet_CreationForm
+        else:
+            raise Exception('Type de produit inconnu (aliment, vegetal, service ou  objet)')
+        return get_produitForm(self.request, self.object.categorie)
+
 # @login_required(login_url='/login/')
 class ProduitSupprimer(DeleteView):
     model = Produit
@@ -83,7 +103,7 @@ class ProduitSupprimer(DeleteView):
 
 @login_required(login_url='/login/')
 def proposerProduit_entree(request):
-    return render(request, 'bourseLibre/produit_proposer_entree.html',  {"couleurs":ChoixProduits.couleurs})
+    return render(request, 'bourseLibre/produit_proposer_entree.html', {"couleurs":Choix.couleurs})
 
 
 # @login_required
@@ -118,14 +138,13 @@ def merci(request, template_name='merci.html'):
 #         else:
 #             return render(request, 'index.html', {'produits': produits})
 
+# @login_required(login_url='/login/')
 def profil_courant(request, ):
     user = get_object_or_404(User, id=request.user.id)
-
-
-
     return render(request, 'profil.html', {'user': user})
 
 
+# @login_required(login_url='/login/')
 def profil(request, user_id):
     try:
         user = User.objects.get(id=user_id)
@@ -137,6 +156,7 @@ def profil(request, user_id):
         # except User.DoesNotExist:
             return render(request, 'profil_inconnu.html', {'userid': user_id})
 
+# @login_required(login_url='/login/')
 def profil_nom(request, user_username):
     try:
         user = User.objects.get(username=user_username)
@@ -144,13 +164,16 @@ def profil_nom(request, user_username):
     except User.DoesNotExist:
         return render(request, 'profil_inconnu.html', {'userid': user_username})
 
+# @login_required(login_url='/login/')
 def profil_inconnu(request):
     return render(request, 'profil_inconnu.html')
 
+# @login_required(login_url='/login/')
 def profil_list(request):
     users = Profil.objects.all()
     return render(request, 'cooperateurs.html', {'users':users, } )
 
+# @login_required(login_url='/login/')
 def profil_contact(request, user_id):
     form = ContactForm(request.POST or None)
     recepteur = Profil.objects.get(id=user_id)
@@ -171,12 +194,30 @@ def profil_contact(request, user_id):
     return render(request, 'profil_contact.html', {'form': form, 'recepteur':recepteur})
 
 
-# @login_required(login_url='/login/')
+class profil_modifier_user(UpdateView):
+    model = Profil
+    form_class = ProducteurCreationForm
+    template_name_suffix = '_modifier'
+#    fields = ['user','site_web','description', 'competences', 'adresse', 'avatar', 'inscrit_newsletter']
+
+    def get_object(self):
+        return User.objects.get(id=self.request.user.id)
+
+class profil_modifier_adresse(UpdateView):
+    model = Adresse
+    form_class = AdresseForm
+    template_name_suffix = '_modifier'
+
+    def get_object(self):
+        return Adresse.objects.get(id=self.request.user.id)
+
 class profil_modifier(UpdateView):
     model = Profil
+    form_class = ProfilCreationForm
     template_name_suffix = '_modifier'
-    fields = ['user','site_web','description', 'competences', 'adresse', 'avatar', 'inscrit_newsletter']
-#profil.set_latlon_from_adresse()
+
+    def get_object(self):
+        return Profil.objects.get(id=self.request.user.id)
 
 def register(request):
     form_adresse = AdresseForm(request.POST or None)
@@ -220,14 +261,14 @@ class ListeProduit(ListView):
         if "gratuit" in params:
             qs = qs.filter(unite_prix='don')
 
-        return qs.order_by('categorie','date_debut', 'user')
+        return qs.order_by('categorie', 'date_debut', 'user')
 
     def get_context_data(self, **kwargs):
         # Call the base implementation first to get a context
         context = super().get_context_data(**kwargs)
 
         # context['producteur_list'] = Profil.objects.values_list('user__username', flat=True).distinct()
-        context['choixPossibles'] = ChoixProduits.choix
+        context['choixPossibles'] = Choix.choix
         context['producteur_list'] = Profil.objects.all()
         context['typeFiltre'] = "aucun"
         if 'producteur' in self.request.GET:
@@ -244,6 +285,18 @@ class ListeProduit(ListView):
 
 def charte(request):
     return render(request, 'charte.html', )
+
+def liens(request):
+    liens = [
+        'https://reporterre.net/',
+        'http://www.le-message.org/?lang=fr',
+        'https://www.monnaielibreoccitanie.org/',
+        'https://www.helloasso.com/associations/mlcpo/collectes/soudaqui-la-monnaie-locale-des-p-o-c-est-maintenant',
+        'https://la-bas.org/',
+        'https://colibris-universite.org/mooc-permaculture/wakka.php?wiki=PagePrincipale',
+        'https://framasoft.org',
+    ]
+    return render(request, 'liens.html', {'liens':liens})
 
 def fairedon(request):
     return render(request, 'fairedon.html', )
